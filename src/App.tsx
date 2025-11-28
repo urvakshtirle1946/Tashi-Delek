@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AudioProvider } from "@/contexts/AudioContext";
+import Loader from "@/components/Loader";
+import Navigation from "@/components/Navigation";
 import Index from "./pages/Index";
 import VirtualTours from "./pages/VirtualTours";
 import InteractiveMapPage from "./pages/Map";
@@ -13,28 +16,48 @@ import GuidesPage from "./pages/Guides";
 import CommunityPage from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const App = () => {
+  // Check if loader has already been shown in this session
+  const [showLoader, setShowLoader] = useState(() => {
+    // Only show loader if it hasn't been completed in this session
+    return !sessionStorage.getItem('loaderCompleted');
+  });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tours" element={<VirtualTours />} />
-          <Route path="/map" element={<InteractiveMapPage />} />
-          <Route path="/calendar" element={<CulturalCalendarPage />} />
-          <Route path="/packages" element={<TravelPackagesPage />} />
-          <Route path="/food" element={<FoodPage />} />
-          <Route path="/guides" element={<GuidesPage />} />
-          <Route path="/community" element={<CommunityPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  useEffect(() => {
+    // When loader completes, mark it in sessionStorage
+    if (!showLoader) {
+      sessionStorage.setItem('loaderCompleted', 'true');
+    }
+  }, [showLoader]);
+
+  return (
+    <AudioProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        {showLoader && <Loader onComplete={() => setShowLoader(false)} />}
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/tours" element={<VirtualTours />} />
+            <Route path="/map" element={<InteractiveMapPage />} />
+            <Route path="/calendar" element={<CulturalCalendarPage />} />
+            <Route path="/packages" element={<TravelPackagesPage />} />
+            <Route path="/food" element={<FoodPage />} />
+            <Route path="/guides" element={<GuidesPage />} />
+            <Route path="/archives" element={<CommunityPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AudioProvider>
+  );
+};
 
 export default App;

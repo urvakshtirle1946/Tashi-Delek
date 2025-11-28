@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Map, MapPin, Route, Compass, Navigation as NavigationIcon, Camera, Clock, ArrowLeft, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import Navigation from "@/components/Navigation";
+import MuteButton from "@/components/MuteButton";
 
 const InteractiveMapPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -74,12 +74,11 @@ const InteractiveMapPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
+    <div className="min-h-screen">
+      <MuteButton position="bottom-left" />
       <main className="pt-24">
         {/* Header */}
-        <section className="py-12">
+        <section className="py-12 -mt-24 sm:-mt-28 bg-gradient-to-b from-secondary/30 to-background">
           <div className="container mx-auto px-4">
             <div className="flex items-center mb-8">
               <Button variant="outline" asChild className="mr-4">

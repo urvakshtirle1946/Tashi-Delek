@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, ArrowLeft, Star, Clock, MapPin, Languages, BookOpen, MessageCircle } from "lucide-react";
-import Navigation from "@/components/Navigation";
+import MuteButton from "@/components/MuteButton";
 
 const GuidesPage = () => {
   const [selectedGuide, setSelectedGuide] = useState<number | null>(null);
@@ -88,11 +88,10 @@ const GuidesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
+    <div className="min-h-screen">
+      <MuteButton position="bottom-left" />
       <main className="pt-24">
-        <section className="py-12">
+        <section className="py-12 -mt-24 sm:-mt-28 bg-gradient-to-b from-secondary/30 to-background">
           <div className="container mx-auto px-4">
             <div className="flex items-center mb-8">
               <Button variant="outline" asChild className="mr-4">

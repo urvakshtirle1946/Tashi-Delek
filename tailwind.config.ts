@@ -47,13 +47,21 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Button colors
+        "deep-earth-brown": "hsl(var(--deep-earth-brown))",
         // Custom Monastery360 colors
         monastery: {
           gold: "hsl(var(--monastery-gold))",
-          red: "hsl(var(--prayer-red))",
-          blue: "hsl(var(--mountain-blue))",
+          "terracotta-red": "hsl(var(--terracotta-red))",
+          "deep-earth-brown": "hsl(var(--deep-earth-brown))",
+          "himalayan-maroon": "hsl(var(--himalayan-maroon))",
+          "soft-gold": "hsl(var(--soft-gold))",
+          "muted-mountain-brown": "hsl(var(--muted-mountain-brown))",
           white: "hsl(var(--snow-white))",
           stone: "hsl(var(--temple-stone))",
+          // Legacy mappings for backward compatibility
+          red: "hsl(var(--prayer-red))",
+          blue: "hsl(var(--mountain-blue))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

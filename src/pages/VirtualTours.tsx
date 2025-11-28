@@ -1,14 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Clock, Users, Star, MapPin, Box, ArrowLeft, Play, Download } from "lucide-react";
+import { Camera, Box, ArrowLeft } from "lucide-react";
+import { DestinationCard } from "@/components/ui/card-21";
 import MonasteryModel from "@/components/3d/MonasteryModel";
-import Navigation from "@/components/Navigation";
-import rumtekImage from "@/assets/rumtek-monastery.jpg";
-import pemayangtseImage from "@/assets/pemayangtse-monastery.jpg";
-import encheyImage from "@/assets/enchey-monastery.jpg";
+import MuteButton from "@/components/MuteButton";
 
 const VirtualTours = () => {
+  const navigate = useNavigate();
+  
   const tours = [
     {
       id: 1,
@@ -19,7 +20,9 @@ const VirtualTours = () => {
       visitors: "12.5k",
       era: "1960s",
       location: "Gangtok",
-      image: rumtekImage,
+      imageUrl: "/assets/Monaestries/Rumtek.jpeg",
+      flag: "🇮🇳",
+      themeColor: "200 50% 30%", // Deep blue-purple for spiritual
       features: ["3D Interior", "Audio Guide", "Historical Timeline", "Prayer Wheel Simulation"]
     },
     {
@@ -31,7 +34,9 @@ const VirtualTours = () => {
       visitors: "8.2k",
       era: "1705",
       location: "Pelling",
-      image: pemayangtseImage,
+      imageUrl: "/assets/Monaestries/Pemayangtse.jpeg",
+      flag: "🇮🇳",
+      themeColor: "25 60% 35%", // Rich orange-gold for ancient
       features: ["Mountain Views", "Ancient Murals", "Sacred Relics", "Meditation Hall"]
     },
     {
@@ -43,35 +48,43 @@ const VirtualTours = () => {
       visitors: "6.8k",
       era: "1909",
       location: "Gangtok",
-      image: encheyImage,
+      imageUrl: "/assets/Monaestries/Enchey.jpeg",
+      flag: "🇮🇳",
+      themeColor: "150 50% 25%", // Deep green for peace
       features: ["Sacred Sculptures", "Prayer Flags", "Peaceful Gardens", "Traditional Architecture"]
     }
   ];
 
-  const handleStartTour = (tourId: number) => {
-    // In a real app, this would navigate to the specific tour
-    alert(`Starting virtual tour for ${tours.find(t => t.id === tourId)?.name}!`);
-  };
-
-  const handleDownloadGuide = (tourId: number) => {
-    // In a real app, this would download the tour guide
-    alert(`Downloading offline guide for ${tours.find(t => t.id === tourId)?.name}!`);
+  const handleTourClick = (e: React.MouseEvent<HTMLAnchorElement>, tourId: number) => {
+    e.preventDefault();
+    const tour = tours.find(t => t.id === tourId);
+    if (tour) {
+      // Navigate to tours page and scroll to 3D model section
+      navigate('/tours');
+      setTimeout(() => {
+        const modelSection = document.querySelector('[data-3d-model]');
+        if (modelSection) {
+          modelSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <main className="pt-24">
+    <div className="min-h-screen">
+      <MuteButton position="bottom-left" />
+      <main className="pt-24 sm:pt-28">
         {/* Header */}
-        <section className="py-12 bg-gradient-to-b from-secondary/30 to-background">
+        <section className="py-12 -mt-24 sm:-mt-28 bg-gradient-to-b from-secondary/30 to-background">
           <div className="container mx-auto px-4">
             <div className="flex items-center mb-8">
-              <Button variant="outline" asChild className="mr-4">
-                <a href="/">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Home
-                </a>
+              <Button 
+                variant="outline" 
+                className="mr-4"
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
               </Button>
             </div>
 
@@ -91,7 +104,7 @@ const VirtualTours = () => {
             </div>
 
             {/* Featured 3D Model */}
-            <div className="mb-16">
+            <div className="mb-16" data-3d-model>
               <div className="text-center mb-8">
                 <Badge className="mb-4 bg-monastery-gold/10 text-monastery-gold hover:bg-monastery-gold/20">
                   <Box className="w-3 h-3 mr-2" />
@@ -117,90 +130,17 @@ const VirtualTours = () => {
             {/* Tours Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {tours.map((tour) => (
-                <Card key={tour.id} className="group hover:shadow-monastery transition-[var(--transition-monastery)] border-0 bg-card/80 backdrop-blur-sm overflow-hidden">
-                  <CardHeader className="p-0">
-                    <div className="relative h-48 overflow-hidden">
-                      <img 
-                        src={tour.image} 
-                        alt={`Virtual tour of ${tour.name}`}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
-                      <div className="absolute top-4 left-4">
-                        <Badge className="bg-primary text-primary-foreground">
-                          {tour.era}
-                        </Badge>
-                      </div>
-                      <div className="absolute top-4 right-4 flex items-center space-x-1 bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full">
-                        <Star className="w-3 h-3 fill-monastery-gold text-monastery-gold" />
-                        <span className="text-xs font-medium">{tour.rating}</span>
-                      </div>
-                      <div className="absolute bottom-4 right-4">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="bg-background/80 backdrop-blur-sm"
-                          onClick={() => handleDownloadGuide(tour.id)}
-                        >
-                          <Download className="w-3 h-3 mr-1" />
-                          Guide
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="p-6">
-                    <CardTitle className="text-lg mb-2 group-hover:text-primary transition-colors">{tour.name}</CardTitle>
-                    <CardDescription className="text-sm mb-4 line-clamp-2">{tour.description}</CardDescription>
-                    
-                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{tour.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{tour.duration}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Users className="w-3 h-3" />
-                          <span>{tour.visitors}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {tour.features.slice(0, 3).map((feature, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {feature}
-                        </Badge>
-                      ))}
-                      {tour.features.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{tour.features.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter className="px-6 pb-6 flex gap-2">
-                    <Button 
-                      className="flex-1 bg-gradient-to-r from-primary to-monastery-gold hover:shadow-lg transition-[var(--transition-monastery)]"
-                      onClick={() => handleStartTour(tour.id)}
-                    >
-                      <Camera className="w-4 h-4 mr-2" />
-                      Start Tour
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => alert(`Preview for ${tour.name}`)}
-                    >
-                      <Play className="w-4 h-4" />
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <div key={tour.id} className="w-full h-[450px]">
+                  <DestinationCard
+                    imageUrl={tour.imageUrl}
+                    location={tour.name}
+                    flag={tour.flag}
+                    stats={`${tour.rating} ⭐ • ${tour.duration} • ${tour.visitors} visitors`}
+                    href="#"
+                    themeColor={tour.themeColor}
+                    onClick={(e) => handleTourClick(e, tour.id)}
+                  />
+                </div>
               ))}
             </div>
 

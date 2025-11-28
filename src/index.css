@@ -8,60 +8,66 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Base colors - Snow white backgrounds with warm monastery tones */
-    --background: 0 0% 98%;
-    --foreground: 15 15% 15%;
+    /* Base colors - Soft gold/light beige backgrounds with warm monastery tones */
+    --background: 38 60% 95%;
+    --foreground: 22 42% 25%;
 
     /* Card system - Clean monastery architecture inspired */
-    --card: 0 0% 100%;
-    --card-foreground: 15 15% 15%;
+    --card: 38 60% 97%;
+    --card-foreground: 22 47% 25%;
 
     /* Popover colors */
-    --popover: 0 0% 100%;
-    --popover-foreground: 15 15% 15%;
+    --popover: 38 60% 97%;
+    --popover-foreground: 22 47% 25%;
 
-    /* Primary - Deep saffron monastery robes */
-    --primary: 25 95% 53%;
+    /* Primary - Terracotta Red */
+    --primary: 18 46% 49%;
     --primary-foreground: 0 0% 98%;
 
-    /* Secondary - Mountain mist blue */
-    --secondary: 210 35% 90%;
-    --secondary-foreground: 15 15% 15%;
+    /* Secondary - Soft Gold */
+    --secondary: 38 60% 68%;
+    --secondary-foreground: 22 47% 25%;
 
-    /* Muted tones - Prayer stone gray */
-    --muted: 210 15% 92%;
-    --muted-foreground: 15 10% 45%;
+    /* Muted tones - Muted Mountain Brown */
+    --muted: 28 48% 90%;
+    --muted-foreground: 22 42% 40%;
 
-    /* Accent - Prayer flag blue */
-    --accent: 210 85% 65%;
-    --accent-foreground: 0 0% 98%;
+    /* Accent - Monastery Gold for borders, icons, highlights */
+    --accent: 38 60% 63%;
+    --accent-foreground: 22 47% 25%;
 
     /* Destructive colors */
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* Borders and inputs */
-    --border: 210 20% 88%;
-    --input: 210 20% 88%;
-    --ring: 25 95% 53%;
+    /* Borders and inputs - Monastery Gold */
+    --border: 38 60% 63%;
+    --input: 38 60% 85%;
+    --ring: 38 60% 63%;
 
     /* Custom monastery colors */
-    --monastery-gold: 45 90% 60%;
-    --prayer-red: 0 75% 55%;
-    --mountain-blue: 210 85% 65%;
+    --monastery-gold: 38 60% 63%;
+    --terracotta-red: 18 46% 49%;
+    --deep-earth-brown: 22 47% 33%;
+    --himalayan-maroon: 22 42% 40%;
+    --soft-gold: 38 60% 68%;
+    --muted-mountain-brown: 28 48% 54%;
     --snow-white: 0 0% 98%;
-    --temple-stone: 30 15% 85%;
+    --temple-stone: 38 60% 92%;
+    /* Legacy color mappings for backward compatibility */
+    --prayer-red: 18 46% 49%;
+    --mountain-blue: 22 47% 33%;
 
     /* Beautiful gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(45 90% 60%) 50%, hsl(210 85% 65%) 100%);
-    --gradient-mountain: linear-gradient(180deg, hsl(210 85% 65%) 0%, hsl(210 35% 90%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(0 75% 55%) 100%);
-    --gradient-peaceful: linear-gradient(135deg, hsl(210 35% 90%) 0%, hsl(0 0% 98%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(18 46% 49%) 0%, hsl(22 47% 33%) 100%);
+    --gradient-mountain: linear-gradient(180deg, hsl(22 47% 33%) 0%, hsl(28 48% 54%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(18 46% 49%) 0%, hsl(38 60% 63%) 100%);
+    --gradient-peaceful: linear-gradient(135deg, hsl(38 60% 68%) 0%, hsl(38 60% 95%) 100%);
 
     /* Shadows with monastery warmth */
-    --shadow-monastery: 0 10px 40px -10px hsl(25 95% 53% / 0.3);
-    --shadow-mountain: 0 20px 60px -15px hsl(210 85% 65% / 0.4);
-    --shadow-gentle: 0 4px 20px -4px hsl(15 15% 15% / 0.1);
+    --shadow-monastery: 0 10px 40px -10px hsl(18 46% 49% / 0.3);
+    --shadow-mountain: 0 20px 60px -15px hsl(22 47% 33% / 0.4);
+    --shadow-gentle: 0 4px 20px -4px hsl(22 42% 20% / 0.1);
 
     /* Animations */
     --transition-monastery: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -87,41 +93,41 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 22 47% 8%;
+    --foreground: 38 60% 90%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 22 47% 10%;
+    --card-foreground: 38 60% 90%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 22 47% 10%;
+    --popover-foreground: 38 60% 90%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 18 46% 55%;
+    --primary-foreground: 22 47% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 28 48% 25%;
+    --secondary-foreground: 38 60% 90%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 22 42% 20%;
+    --muted-foreground: 38 60% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 38 60% 63%;
+    --accent-foreground: 38 60% 90%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 38 60% 30%;
+    --input: 38 60% 25%;
+    --ring: 38 60% 63%;
+    --sidebar-background: 22 47% 8%;
+    --sidebar-foreground: 38 60% 90%;
+    --sidebar-primary: 18 46% 55%;
+    --sidebar-primary-foreground: 22 47% 8%;
+    --sidebar-accent: 22 42% 15%;
+    --sidebar-accent-foreground: 38 60% 90%;
+    --sidebar-border: 38 60% 20%;
+    --sidebar-ring: 38 60% 63%;
   }
 }
 
@@ -130,7 +136,25 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html, body {
+    overscroll-behavior-y: none;
+    background: transparent !important;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: hsl(var(--deep-earth-brown));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* Body text uses foreground (dark maroon/near-black) */
+  p, span:not([class*="text-"]), div:not([class*="text-"]), li, td, th {
+    color: hsl(var(--foreground));
   }
 }

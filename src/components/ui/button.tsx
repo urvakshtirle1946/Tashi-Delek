@@ -9,7 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-gentle hover:shadow-monastery",
+        default: "bg-deep-earth-brown text-primary-foreground hover:bg-monastery-gold shadow-gentle hover:shadow-monastery transition-colors",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
@@ -17,8 +17,8 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         // Custom monastery variants
         monastery: "bg-gradient-to-r from-primary to-monastery-gold text-primary-foreground hover:shadow-monastery hover:scale-105",
-        spiritual: "bg-gradient-to-r from-monastery-blue to-primary text-primary-foreground hover:shadow-mountain hover:scale-105",
-        heritage: "bg-gradient-to-r from-monastery-red to-primary text-primary-foreground hover:shadow-monastery hover:scale-105",
+        spiritual: "bg-gradient-to-r from-deep-earth-brown to-monastery-gold text-primary-foreground hover:shadow-mountain hover:scale-105",
+        heritage: "bg-gradient-to-r from-terracotta-red to-primary text-primary-foreground hover:shadow-monastery hover:scale-105",
         golden: "bg-gradient-to-r from-monastery-gold to-primary text-primary-foreground hover:shadow-lg hover:scale-105",
       },
       size: {
