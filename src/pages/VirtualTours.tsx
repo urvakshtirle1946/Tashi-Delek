@@ -9,7 +9,7 @@ import MuteButton from "@/components/MuteButton";
 
 const VirtualTours = () => {
   const navigate = useNavigate();
-  
+
   const tours = [
     {
       id: 1,
@@ -59,14 +59,16 @@ const VirtualTours = () => {
     e.preventDefault();
     const tour = tours.find(t => t.id === tourId);
     if (tour) {
-      // Navigate to tours page and scroll to 3D model section
-      navigate('/tours');
-      setTimeout(() => {
+      // Navigate to specific tour page based on monastery
+      if (tour.name === "Rumtek Monastery") {
+        navigate('/tours/rumtek');
+      } else {
+        // For other monasteries, scroll to 3D model section
         const modelSection = document.querySelector('[data-3d-model]');
         if (modelSection) {
           modelSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }, 100);
+      }
     }
   };
 
@@ -78,8 +80,8 @@ const VirtualTours = () => {
         <section className="py-12 -mt-24 sm:-mt-28 bg-gradient-to-b from-secondary/30 to-background">
           <div className="container mx-auto px-4">
             <div className="flex items-center mb-8">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="mr-4"
                 onClick={() => navigate('/')}
               >
@@ -98,7 +100,7 @@ const VirtualTours = () => {
                 <span className="bg-gradient-to-r from-primary to-monastery-gold bg-clip-text text-transparent"> Virtual Tours</span>
               </h1>
               <p className="text-lg text-muted-foreground">
-                Step inside ancient monasteries from anywhere in the world. Experience the sacred atmosphere, 
+                Step inside ancient monasteries from anywhere in the world. Experience the sacred atmosphere,
                 explore intricate details, and learn about centuries of spiritual tradition through cutting-edge technology.
               </p>
             </div>
@@ -117,9 +119,9 @@ const VirtualTours = () => {
                   Interact with our detailed 3D monastery model. Click and drag to explore every angle.
                 </p>
               </div>
-              
+
               <div className="max-w-4xl mx-auto">
-                <MonasteryModel 
+                <MonasteryModel
                   title="Sacred Architecture in 3D"
                   description="Click and drag to explore • Scroll to zoom • Interactive hotspots"
                   className="shadow-monastery"
