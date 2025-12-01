@@ -9,6 +9,10 @@ import Navigation from "@/components/Navigation";
 import Index from "./pages/Index";
 import VirtualTours from "./pages/VirtualTours";
 import RumtekTour from "./pages/RumtekTour";
+import EncheyTour from "./pages/EncheyTour";
+import PelingGumpaTour from "./pages/PelingGumpaTour";
+import PhodongTour from "./pages/PhodongTour";
+import RavanglaTour from "./pages/RavanglaTour";
 import InteractiveMapPage from "./pages/Map";
 import CulturalCalendarPage from "./pages/Calendar";
 import TravelPackagesPage from "./pages/Packages";
@@ -21,7 +25,7 @@ import NotFound from "./pages/NotFound";
 const ConditionalNavigation = () => {
   const location = useLocation();
   // Hide navigation on 3D tour pages
-  const hideNavRoutes = ['/tours/rumtek'];
+  const hideNavRoutes = ['/tours/rumtek', '/tours/enchey', '/tours/pelinggumpa', '/tours/phodong', '/tours/ravangla'];
 
   if (hideNavRoutes.includes(location.pathname)) {
     return null;
@@ -61,6 +65,10 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/tours" element={<VirtualTours />} />
             <Route path="/tours/rumtek" element={<RumtekTour />} />
+            <Route path="/tours/enchey" element={<EncheyTour />} />
+            <Route path="/tours/pelinggumpa" element={<PelingGumpaTour />} />
+            <Route path="/tours/phodong" element={<PhodongTour />} />
+            <Route path="/tours/ravangla" element={<RavanglaTour />} />
             <Route path="/map" element={<InteractiveMapPage />} />
             <Route path="/calendar" element={<CulturalCalendarPage />} />
             <Route path="/packages" element={<TravelPackagesPage />} />

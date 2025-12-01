@@ -13,6 +13,39 @@ import {
   Home
 } from 'lucide-react';
 import * as THREE from 'three';
+import VoiceGuide, { ModelInfo } from '@/components/VoiceGuide';
+
+// Rumtek Monastery Information for Voice Guide
+const rumtekInfo: ModelInfo = {
+  id: 'rumtek',
+  name: 'Rumtek Monastery',
+  location: 'Gangtok, Sikkim, India - situated at an altitude of 5,800 feet',
+  established: '1966',
+  description: 'Rumtek Monastery, also known as the Dharmachakra Centre, is one of the largest and most significant monasteries in Sikkim. It serves as the main seat of the Karma Kagyu lineage of Tibetan Buddhism outside Tibet.',
+  history: 'The original Rumtek Monastery was built in 1740 by the 12th Karmapa, Changchub Dorje. After the 16th Karmapa, Rangjung Rigpe Dorje, fled Tibet in 1959 following the Chinese invasion, he chose Sikkim as his new home. With theثsupport of the Sikkimese royal family, he built the present monastery complex between 1961 and 1966, replicating the design of the original Tsurphu Monastery in Tibet.',
+  architecture: 'The monastery showcases traditional Tibetan Buddhist architecture with intricate murals, thangka paintings, and statues. The main shrine houses a 4-story high statue of Buddha Shakyamuni. The complex includes the main temple, a golden stupa containing relics of the 16th Karmapa, the Karma Shri Nalanda Institute for Buddhist Studies, and monks\' quarters.',
+  significance: 'Rumtek is the seat of the Karmapa, the head of the Karma Kagyu school of Tibetan Buddhism. It houses some of the most sacred Buddhist relics, including the famous Black Hat used in the Black Hat ceremony. The monastery is a center for Buddhist learning and meditation, attracting scholars and practitioners from around the world.',
+  visitingHours: 'The monastery is open daily from 6:00 AM to 6:00 PM. Photography is not allowed inside the main shrine.',
+  bestTimeToVisit: 'The best time to visit is from March to May and September to November when the weather is pleasant. During Losar (Tibetan New Year) and other festivals, special ceremonies are held.',
+  nearbyAttractions: [
+    'Lingdum Monastery',
+    'Gangtok City',
+    'Enchey Monastery',
+    'Tsomgo Lake',
+    'Nathula Pass',
+    'Hanuman Tok'
+  ],
+  facts: [
+    'The Golden Stupa at Rumtek contains the preserved relics of the 16th Karmapa and is covered with gold leaf.',
+    'The monastery houses a 1000-year-old sacred Black Hat, used only in special ceremonies.',
+    'Rumtek is designed as a replica of the original Tsurphu Monastery in Tibet.',
+    'The monastery complex spans over 74 acres and took 5 years to complete.',
+    'It is home to the Karma Shri Nalanda Institute, one of the most important centers for Buddhist philosophy.',
+    'The monastery has a collection of rare Buddhist scriptures and texts rescued from Tibet.',
+    'Every year, sacred Cham dances are performed during the Tibetan New Year celebrations.',
+    'The 16th Karmapa personally designed many of the murals and artwork inside the monastery.'
+  ]
+};
 
 interface ModelProps {
   isRotating: boolean;
@@ -213,6 +246,9 @@ const RumtekTour = () => {
           </Button>
         </div>
       </div>
+
+      {/* Voice Guide Chatbot */}
+      <VoiceGuide modelInfo={rumtekInfo} />
     </div>
   );
 };

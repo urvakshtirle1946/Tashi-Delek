@@ -23,7 +23,8 @@ const VirtualTours = () => {
       imageUrl: "/assets/Monaestries/Rumtek.jpeg",
       flag: "🇮🇳",
       themeColor: "200 50% 30%", // Deep blue-purple for spiritual
-      features: ["3D Interior", "Audio Guide", "Historical Timeline", "Prayer Wheel Simulation"]
+      features: ["3D Interior", "Audio Guide", "Historical Timeline", "Prayer Wheel Simulation"],
+      route: "/tours/rumtek"
     },
     {
       id: 2,
@@ -37,7 +38,8 @@ const VirtualTours = () => {
       imageUrl: "/assets/Monaestries/Pemayangtse.jpeg",
       flag: "🇮🇳",
       themeColor: "25 60% 35%", // Rich orange-gold for ancient
-      features: ["Mountain Views", "Ancient Murals", "Sacred Relics", "Meditation Hall"]
+      features: ["Mountain Views", "Ancient Murals", "Sacred Relics", "Meditation Hall"],
+      route: "/tours/pelinggumpa"
     },
     {
       id: 3,
@@ -51,23 +53,52 @@ const VirtualTours = () => {
       imageUrl: "/assets/Monaestries/Enchey.jpeg",
       flag: "🇮🇳",
       themeColor: "150 50% 25%", // Deep green for peace
-      features: ["Sacred Sculptures", "Prayer Flags", "Peaceful Gardens", "Traditional Architecture"]
+      features: ["Sacred Sculptures", "Prayer Flags", "Peaceful Gardens", "Traditional Architecture"],
+      route: "/tours/enchey"
+    },
+    {
+      id: 4,
+      name: "Phodong Monastery",
+      description: "One of the six major Karma Kagyu monasteries in North Sikkim",
+      duration: "40 min",
+      rating: 4.6,
+      visitors: "5.5k",
+      era: "1740",
+      location: "North Sikkim",
+      imageUrl: "/assets/Monaestries/phodong.webp",
+      flag: "🇮🇳",
+      themeColor: "220 50% 35%", // Purple-blue for spiritual
+      features: ["Ancient Murals", "Buddhist Artifacts", "Meditation Halls", "Traditional Architecture"],
+      route: "/tours/phodong"
+    },
+    {
+      id: 5,
+      name: "Ravangla Monastery",
+      description: "Beautiful monastery with panoramic Himalayan views in South Sikkim",
+      duration: "35 min",
+      rating: 4.7,
+      visitors: "7.2k",
+      era: "1990s",
+      location: "Ravangla",
+      imageUrl: "/assets/Monaestries/Ravangla.webp",
+      flag: "🇮🇳",
+      themeColor: "180 50% 30%", // Teal-green for mountains
+      features: ["Mountain Views", "Prayer Flags", "Meditation Retreat", "Buddhist Festivals"],
+      route: "/tours/ravangla"
     }
   ];
 
   const handleTourClick = (e: React.MouseEvent<HTMLAnchorElement>, tourId: number) => {
     e.preventDefault();
     const tour = tours.find(t => t.id === tourId);
-    if (tour) {
-      // Navigate to specific tour page based on monastery
-      if (tour.name === "Rumtek Monastery") {
-        navigate('/tours/rumtek');
-      } else {
-        // For other monasteries, scroll to 3D model section
-        const modelSection = document.querySelector('[data-3d-model]');
-        if (modelSection) {
-          modelSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    if (tour && tour.route) {
+      // Navigate to specific tour page
+      navigate(tour.route);
+    } else {
+      // For other monasteries, scroll to 3D model section
+      const modelSection = document.querySelector('[data-3d-model]');
+      if (modelSection) {
+        modelSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   };
@@ -105,29 +136,7 @@ const VirtualTours = () => {
               </p>
             </div>
 
-            {/* Featured 3D Model */}
-            <div className="mb-16" data-3d-model>
-              <div className="text-center mb-8">
-                <Badge className="mb-4 bg-monastery-gold/10 text-monastery-gold hover:bg-monastery-gold/20">
-                  <Box className="w-3 h-3 mr-2" />
-                  Interactive 3D Experience
-                </Badge>
-                <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Explore in Full 3D
-                </h2>
-                <p className="text-muted-foreground">
-                  Interact with our detailed 3D monastery model. Click and drag to explore every angle.
-                </p>
-              </div>
 
-              <div className="max-w-4xl mx-auto">
-                <MonasteryModel
-                  title="Sacred Architecture in 3D"
-                  description="Click and drag to explore • Scroll to zoom • Interactive hotspots"
-                  className="shadow-monastery"
-                />
-              </div>
-            </div>
 
             {/* Tours Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
