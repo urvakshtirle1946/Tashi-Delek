@@ -113,8 +113,8 @@ const RavanglaTour = () => {
           fallback={
             <Html center>
               <div className="flex flex-col items-center justify-center">
-                <div className="w-16 h-16 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-4" />
-                <span className="text-white text-lg font-medium">Loading Model...</span>
+                <div className="w-16 h-16 border-4 border-[#D3AF37]/30 border-t-amber-500 rounded-full animate-spin mb-4" />
+                <span className="text-[#D3AF37] text-lg font-medium">Loading Model...</span>
               </div>
             </Html>
           }
@@ -180,7 +180,7 @@ const RavanglaTour = () => {
         <Button
           variant="outline"
           size="icon"
-          className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border-white/20 text-white hover:bg-black/60 hover:text-white shadow-lg"
+          className="w-12 h-12 rounded-full bg-[#650304]/60 backdrop-blur-md border-[#D3AF37]/30 text-[#D3AF37] hover:bg-[#650304]/80 hover:text-[#D3AF37] shadow-lg"
           onClick={() => navigate('/tours')}
         >
           <ArrowLeft className="w-5 h-5" />
@@ -192,7 +192,7 @@ const RavanglaTour = () => {
         <Button
           variant="outline"
           size="icon"
-          className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border-white/20 text-white hover:bg-black/60 hover:text-white shadow-lg"
+          className="w-12 h-12 rounded-full bg-[#650304]/60 backdrop-blur-md border-[#D3AF37]/30 text-[#D3AF37] hover:bg-[#650304]/80 hover:text-[#D3AF37] shadow-lg"
           onClick={() => navigate('/')}
         >
           <Home className="w-5 h-5" />
@@ -201,14 +201,14 @@ const RavanglaTour = () => {
 
       {/* Minimal Control Bar - Bottom Center */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
-        <div className="flex items-center gap-3 bg-black/50 backdrop-blur-xl rounded-full px-4 py-3 border border-white/10 shadow-2xl">
+        <div className="flex items-center gap-3 bg-[#650304]/50 backdrop-blur-xl rounded-full px-4 py-3 border border-[#D3AF37]/20 shadow-2xl">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsRotating(!isRotating)}
             className={`w-10 h-10 rounded-full transition-all ${isRotating
-              ? 'bg-amber-500 text-white hover:bg-amber-600'
-              : 'text-white/70 hover:text-white hover:bg-white/10'
+              ? 'bg-[#D3AF37] text-[#650304] hover:bg-[#E5C047]'
+              : 'text-[#D3AF37]/70 hover:text-[#D3AF37] hover:bg-[#D3AF37]/10'
               }`}
           >
             {isRotating ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -220,7 +220,7 @@ const RavanglaTour = () => {
             variant="ghost"
             size="icon"
             onClick={zoomOut}
-            className="w-10 h-10 rounded-full text-white/70 hover:text-white hover:bg-white/10"
+            className="w-10 h-10 rounded-full text-[#D3AF37]/70 hover:text-[#D3AF37] hover:bg-[#D3AF37]/10"
           >
             <ZoomOut className="w-4 h-4" />
           </Button>
@@ -229,7 +229,7 @@ const RavanglaTour = () => {
             variant="ghost"
             size="icon"
             onClick={zoomIn}
-            className="w-10 h-10 rounded-full text-white/70 hover:text-white hover:bg-white/10"
+            className="w-10 h-10 rounded-full text-[#D3AF37]/70 hover:text-[#D3AF37] hover:bg-[#D3AF37]/10"
           >
             <ZoomIn className="w-4 h-4" />
           </Button>
@@ -240,7 +240,7 @@ const RavanglaTour = () => {
             variant="ghost"
             size="icon"
             onClick={resetCamera}
-            className="w-10 h-10 rounded-full text-white/70 hover:text-white hover:bg-white/10"
+            className="w-10 h-10 rounded-full text-[#D3AF37]/70 hover:text-[#D3AF37] hover:bg-[#D3AF37]/10"
           >
             <RotateCcw className="w-4 h-4" />
           </Button>

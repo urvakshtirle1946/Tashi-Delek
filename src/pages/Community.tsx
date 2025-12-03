@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ArrowLeft, Upload, Camera, BookOpen, Users, Share2, MessageCircle } from "lucide-react";
+import { Heart, ArrowLeft, Upload, Camera, BookOpen, Share2, MessageCircle } from "lucide-react";
 import MuteButton from "@/components/MuteButton";
+import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
+import type { CardData } from "@/components/ui/stacked-cards-interaction";
+import { Lens } from "@/components/ui/lens";
 
 const CommunityPage = () => {
   const [selectedTab, setSelectedTab] = useState<string>("photos");
@@ -19,7 +22,31 @@ const CommunityPage = () => {
       likes: 45,
       comments: 12,
       description: "Captured during the beautiful morning prayer session",
-      image: "/api/placeholder/400/300"
+      image: "https://images.unsplash.com/photo-1528741254566-d718e868201f?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 6,
+      type: "photo",
+      title: "Sunset at Rumtek Monastery",
+      contributor: "Sonam Bhutia",
+      location: "Rumtek Monastery",
+      date: "3 days ago",
+      likes: 89,
+      comments: 15,
+      description: "Golden hour painting the monastery walls in warm hues",
+      image: "https://images.unsplash.com/photo-1604823732630-491316b5cf83?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 7,
+      type: "photo",
+      title: "Prayer Wheels at Pemayangtse",
+      contributor: "Lhakpa Sherpa",
+      location: "Pemayangtse Monastery",
+      date: "1 week ago",
+      likes: 67,
+      comments: 9,
+      description: "Ancient prayer wheels spinning in the mountain breeze",
+      image: "https://images.unsplash.com/photo-1591825729269-caeb344f6df2?q=80&w=800&auto=format&fit=crop"
     },
     {
       id: 2,
@@ -30,7 +57,8 @@ const CommunityPage = () => {
       date: "5 days ago",
       likes: 78,
       comments: 23,
-      description: "Oral history passed down through generations"
+      description: "Oral history passed down through generations about the sacred rituals and daily life at Rumtek",
+      image: "https://images.unsplash.com/photo-1545450660-cd1cd6baa72d?q=80&w=800&auto=format&fit=crop"
     },
     {
       id: 3,
@@ -42,41 +70,48 @@ const CommunityPage = () => {
       likes: 156,
       comments: 34,
       description: "Rare manuscript discovery shared with preservation team"
+    },
+    {
+      id: 4,
+      type: "story",
+      title: "The Legend of Enchey's Foundation",
+      contributor: "Dorji Wangchuk",
+      location: "Enchey Monastery",
+      date: "1 week ago",
+      likes: 92,
+      comments: 18,
+      description: "Ancient tales of how Enchey Monastery was blessed by Tantric masters in the 19th century",
+      image: "https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 5,
+      type: "story",
+      title: "Pilgrimage Journey to Pemayangtse",
+      contributor: "Tashi Namgyal",
+      location: "Pemayangtse Monastery",
+      date: "2 weeks ago",
+      likes: 134,
+      comments: 27,
+      description: "My family's 50-year tradition of annual pilgrimage and the spiritual teachings we've received",
+      image: "https://images.unsplash.com/photo-1526827826797-7b05204a22ef?q=80&w=800&auto=format&fit=crop"
     }
   ];
 
-  const features = [
-    {
-      icon: Upload,
-      title: "Share Photos",
-      description: "Upload your monastery visits and cultural experiences"
-    },
-    {
-      icon: BookOpen,
-      title: "Oral Histories",
-      description: "Record and preserve stories from elders and monks"
-    },
-    {
-      icon: Camera,
-      title: "Document Heritage",
-      description: "Help create a digital archive of Sikkim's monasteries"
-    },
-    {
-      icon: Users,
-      title: "Connect",
-      description: "Join a community passionate about cultural preservation"
-    }
-  ];
+  // Story cards data for stacked interaction
+  const storyCards: CardData[] = contributions
+    .filter(c => c.type === "story")
+    .slice(0, 3)
+    .map(story => ({
+      image: story.image,
+      title: story.title,
+      description: story.description,
+    }));
 
   const tabs = [
     { id: "photos", label: "Photos", icon: Camera },
     { id: "stories", label: "Stories", icon: BookOpen },
     { id: "manuscripts", label: "Manuscripts", icon: Upload }
   ];
-
-  const handleContribute = (type: string) => {
-    alert(`Opening contribution form for ${type}! Share your cultural heritage with the community.`);
-  };
 
   const handleLike = (contributionId: number) => {
     alert(`Liked contribution #${contributionId}! Thank you for supporting the community.`);
@@ -105,64 +140,6 @@ const CommunityPage = () => {
               </Button>
             </div>
 
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <Badge className="mb-4 bg-monastery-red/10 text-monastery-red hover:bg-monastery-red/20">
-                <Heart className="w-3 h-3 mr-2" />
-                Participatory Heritage Preservation
-              </Badge>
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                Community
-                <span className="bg-gradient-to-r from-monastery-red to-primary bg-clip-text text-transparent"> Archives</span>
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                Help preserve Sikkim's monastery heritage by sharing photos, oral histories, and manuscripts. 
-                Together, we're creating a living digital archive for future generations.
-              </p>
-            </div>
-
-            {/* Features */}
-            <div className="grid md:grid-cols-4 gap-6 mb-16">
-              {features.map((feature, index) => {
-                const Icon = feature.icon;
-                return (
-                  <div key={index} className="text-center space-y-3">
-                    <div className="w-16 h-16 bg-gradient-to-br from-monastery-red/10 to-primary/10 rounded-full flex items-center justify-center mx-auto">
-                      <Icon className="w-8 h-8 text-monastery-red" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-1">{feature.title}</h3>
-                      <p className="text-sm text-muted-foreground">{feature.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Contribution Buttons */}
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
-              <Button 
-                className="bg-gradient-to-r from-monastery-red to-primary"
-                onClick={() => handleContribute("photo")}
-              >
-                <Camera className="w-4 h-4 mr-2" />
-                Share Photos
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => handleContribute("story")}
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Record Story
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => handleContribute("manuscript")}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Manuscript
-              </Button>
-            </div>
-
             {/* Tabs */}
             <div className="flex justify-center mb-8">
               <div className="flex space-x-1 bg-secondary/50 p-1 rounded-lg">
@@ -185,76 +162,108 @@ const CommunityPage = () => {
             </div>
 
             {/* Community Contributions */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {contributions
-                .filter(c => selectedTab === "photos" ? c.type === "photo" : 
-                           selectedTab === "stories" ? c.type === "story" : 
-                           selectedTab === "manuscripts" ? c.type === "manuscript" : true)
-                .map((contribution) => (
-                <Card key={contribution.id} className="group hover:shadow-monastery transition-[var(--transition-monastery)] border-0 bg-card/80 backdrop-blur-sm overflow-hidden">
-                  {contribution.image && (
-                    <CardHeader className="p-0">
-                      <div className="relative h-48 overflow-hidden">
-                        <img 
-                          src={contribution.image} 
-                          alt={contribution.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                      </div>
-                    </CardHeader>
-                  )}
-                  
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-2">
-                      <CardTitle className="text-lg line-clamp-2">{contribution.title}</CardTitle>
-                      <Badge variant="outline" className="text-xs ml-2">
-                        {contribution.type}
-                      </Badge>
-                    </div>
+            {selectedTab === "stories" ? (
+              // Stacked Cards for Stories
+              <div className="mb-16">
+                <h3 className="text-2xl font-semibold text-center mb-8 text-foreground">
+                  Oral Histories & Monastery Tales
+                </h3>
+                <div className="flex justify-center items-center min-h-[500px]">
+                  <StackedCardsInteraction 
+                    cards={storyCards}
+                    spreadDistance={60}
+                    rotationAngle={8}
+                    animationDelay={0.15}
+                  />
+                </div>
+                <p className="text-center text-muted-foreground mt-8 max-w-2xl mx-auto">
+                  Hover over the cards to explore different monastery stories passed down through generations
+                </p>
+              </div>
+            ) : (
+              // Regular Grid for Photos and Manuscripts
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {contributions
+                  .filter(c => selectedTab === "photos" ? c.type === "photo" : 
+                             selectedTab === "manuscripts" ? c.type === "manuscript" : true)
+                  .map((contribution) => (
+                  <Card key={contribution.id} className="group hover:shadow-monastery transition-[var(--transition-monastery)] border-0 bg-card/80 backdrop-blur-sm overflow-hidden">
+                    {contribution.image && (
+                      <CardHeader className="p-0">
+                        {selectedTab === "photos" ? (
+                          <Lens zoomFactor={2} lensSize={150}>
+                            <div className="relative h-48 overflow-hidden">
+                              <img 
+                                src={contribution.image} 
+                                alt={contribution.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </Lens>
+                        ) : (
+                          <div className="relative h-48 overflow-hidden">
+                            <img 
+                              src={contribution.image} 
+                              alt={contribution.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                          </div>
+                        )}
+                      </CardHeader>
+                    )}
                     
-                    <CardDescription className="text-sm mb-4 line-clamp-2">
-                      {contribution.description}
-                    </CardDescription>
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-2">
+                        <CardTitle className="text-lg line-clamp-2">{contribution.title}</CardTitle>
+                        <Badge variant="outline" className="text-xs ml-2">
+                          {contribution.type}
+                        </Badge>
+                      </div>
+                      
+                      <CardDescription className="text-sm mb-4 line-clamp-2">
+                        {contribution.description}
+                      </CardDescription>
 
-                    <div className="space-y-2 mb-4 text-sm text-muted-foreground">
-                      <div>By {contribution.contributor}</div>
-                      <div>{contribution.location} • {contribution.date}</div>
-                    </div>
+                      <div className="space-y-2 mb-4 text-sm text-muted-foreground">
+                        <div>By {contribution.contributor}</div>
+                        <div>{contribution.location} • {contribution.date}</div>
+                      </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-border/20">
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center justify-between pt-4 border-t border-border/20">
+                        <div className="flex items-center space-x-4">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleLike(contribution.id)}
+                            className="text-muted-foreground hover:text-monastery-red"
+                          >
+                            <Heart className="w-4 h-4 mr-1" />
+                            {contribution.likes}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleComment(contribution.id)}
+                            className="text-muted-foreground hover:text-monastery-blue"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            {contribution.comments}
+                          </Button>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleLike(contribution.id)}
-                          className="text-muted-foreground hover:text-monastery-red"
+                          onClick={() => handleShare(contribution.id)}
+                          className="text-muted-foreground hover:text-monastery-gold"
                         >
-                          <Heart className="w-4 h-4 mr-1" />
-                          {contribution.likes}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleComment(contribution.id)}
-                          className="text-muted-foreground hover:text-monastery-blue"
-                        >
-                          <MessageCircle className="w-4 h-4 mr-1" />
-                          {contribution.comments}
+                          <Share2 className="w-4 h-4" />
                         </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleShare(contribution.id)}
-                        className="text-muted-foreground hover:text-monastery-gold"
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
 
             {/* Impact Stats */}
             <div className="mt-20 text-center">

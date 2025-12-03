@@ -138,12 +138,13 @@ const MonasteryModel = ({
             far: 100 
           }}
           gl={{ 
-            antialias: true, 
+            antialias: window.devicePixelRatio < 2, 
             alpha: true,
-            preserveDrawingBuffer: true,
-            powerPreference: "high-performance",
+            preserveDrawingBuffer: false,
+            powerPreference: "default",
             failIfMajorPerformanceCaveat: false
           }}
+          dpr={Math.min(window.devicePixelRatio, 2)}
         >
           <Suspense 
             fallback={
@@ -272,7 +273,7 @@ const MonasteryModel = ({
   );
 };
 
-// Preload the model
-useGLTF.preload('/assets/Models/Rumtek.glb');
+// Removed preload for better initial page load performance
+// Models will load on-demand when component mounts
 
 export default MonasteryModel;

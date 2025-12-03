@@ -1,6 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Lenis Smooth Scroll */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
 
 /* Monastery360 Design System - Inspired by Sikkim's monasteries and Himalayan beauty
 All colors MUST be HSL.
@@ -9,65 +32,67 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Base colors - Soft gold/light beige backgrounds with warm monastery tones */
-    --background: 38 60% 95%;
-    --foreground: 22 42% 25%;
+    --background: 45 65% 95%;
+    --foreground: 0 60% 20%;
 
     /* Card system - Clean monastery architecture inspired */
-    --card: 38 60% 97%;
-    --card-foreground: 22 47% 25%;
+    --card: 45 65% 97%;
+    --card-foreground: 0 60% 20%;
 
     /* Popover colors */
-    --popover: 38 60% 97%;
-    --popover-foreground: 22 47% 25%;
+    --popover: 45 65% 97%;
+    --popover-foreground: 0 60% 20%;
 
-    /* Primary - Terracotta Red */
-    --primary: 18 46% 49%;
+    /* Primary - Deep Maroon Red #650304 */
+    --primary: 0 95% 20%;
     --primary-foreground: 0 0% 98%;
 
-    /* Secondary - Soft Gold */
-    --secondary: 38 60% 68%;
-    --secondary-foreground: 22 47% 25%;
+    /* Secondary - Royal Gold #D3AF37 */
+    --secondary: 45 65% 53%;
+    --secondary-foreground: 0 60% 20%;
 
-    /* Muted tones - Muted Mountain Brown */
-    --muted: 28 48% 90%;
-    --muted-foreground: 22 42% 40%;
+    /* Muted tones */
+    --muted: 45 50% 90%;
+    --muted-foreground: 0 40% 40%;
 
-    /* Accent - Monastery Gold for borders, icons, highlights */
-    --accent: 38 60% 63%;
-    --accent-foreground: 22 47% 25%;
+    /* Accent - Royal Gold for borders, icons, highlights */
+    --accent: 45 65% 53%;
+    --accent-foreground: 0 60% 20%;
 
     /* Destructive colors */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    /* Borders and inputs - Monastery Gold */
-    --border: 38 60% 63%;
-    --input: 38 60% 85%;
-    --ring: 38 60% 63%;
+    /* Borders and inputs - Royal Gold */
+    --border: 45 65% 53%;
+    --input: 45 60% 85%;
+    --ring: 45 65% 53%;
 
-    /* Custom monastery colors */
-    --monastery-gold: 38 60% 63%;
-    --terracotta-red: 18 46% 49%;
-    --deep-earth-brown: 22 47% 33%;
-    --himalayan-maroon: 22 42% 40%;
-    --soft-gold: 38 60% 68%;
-    --muted-mountain-brown: 28 48% 54%;
+    /* Custom monastery colors - Updated with new palette */
+    --monastery-gold: 45 65% 53%;
+    --terracotta-red: 0 95% 20%;
+    --deep-earth-brown: 0 60% 20%;
+    --himalayan-maroon: 0 95% 20%;
+    --soft-gold: 45 65% 53%;
+    --muted-mountain-brown: 45 50% 54%;
     --snow-white: 0 0% 98%;
-    --temple-stone: 38 60% 92%;
+    --temple-stone: 45 60% 92%;
     /* Legacy color mappings for backward compatibility */
-    --prayer-red: 18 46% 49%;
-    --mountain-blue: 22 47% 33%;
+    --prayer-red: 0 95% 20%;
+    --mountain-blue: 0 60% 25%;
+    --monastery-red: 0 95% 20%;
+    --monastery-blue: 0 60% 25%;
 
-    /* Beautiful gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(18 46% 49%) 0%, hsl(22 47% 33%) 100%);
-    --gradient-mountain: linear-gradient(180deg, hsl(22 47% 33%) 0%, hsl(28 48% 54%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(18 46% 49%) 0%, hsl(38 60% 63%) 100%);
-    --gradient-peaceful: linear-gradient(135deg, hsl(38 60% 68%) 0%, hsl(38 60% 95%) 100%);
+    /* Beautiful gradients - Updated with #650304 and #D3AF37 */
+    --gradient-hero: linear-gradient(135deg, #650304 0%, #D3AF37 100%);
+    --gradient-mountain: linear-gradient(180deg, #650304 0%, #8B6914 100%);
+    --gradient-sunset: linear-gradient(135deg, #650304 0%, #D3AF37 100%);
+    --gradient-peaceful: linear-gradient(135deg, #D3AF37 0%, #F5E6C3 100%);
 
-    /* Shadows with monastery warmth */
-    --shadow-monastery: 0 10px 40px -10px hsl(18 46% 49% / 0.3);
-    --shadow-mountain: 0 20px 60px -15px hsl(22 47% 33% / 0.4);
-    --shadow-gentle: 0 4px 20px -4px hsl(22 42% 20% / 0.1);
+    /* Shadows with monastery warmth - Updated */
+    --shadow-monastery: 0 10px 40px -10px rgba(101, 3, 4, 0.3);
+    --shadow-mountain: 0 20px 60px -15px rgba(101, 3, 4, 0.4);
+    --shadow-gentle: 0 4px 20px -4px rgba(101, 3, 4, 0.1);
 
     /* Animations */
     --transition-monastery: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -93,41 +118,41 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 22 47% 8%;
-    --foreground: 38 60% 90%;
+    --background: 0 50% 8%;
+    --foreground: 45 60% 90%;
 
-    --card: 22 47% 10%;
-    --card-foreground: 38 60% 90%;
+    --card: 0 50% 10%;
+    --card-foreground: 45 60% 90%;
 
-    --popover: 22 47% 10%;
-    --popover-foreground: 38 60% 90%;
+    --popover: 0 50% 10%;
+    --popover-foreground: 45 60% 90%;
 
-    --primary: 18 46% 55%;
-    --primary-foreground: 22 47% 8%;
+    --primary: 0 95% 25%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 28 48% 25%;
-    --secondary-foreground: 38 60% 90%;
+    --secondary: 45 65% 45%;
+    --secondary-foreground: 45 60% 90%;
 
-    --muted: 22 42% 20%;
-    --muted-foreground: 38 60% 70%;
+    --muted: 0 40% 20%;
+    --muted-foreground: 45 60% 70%;
 
-    --accent: 38 60% 63%;
-    --accent-foreground: 38 60% 90%;
+    --accent: 45 65% 53%;
+    --accent-foreground: 45 60% 90%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 38 60% 30%;
-    --input: 38 60% 25%;
-    --ring: 38 60% 63%;
-    --sidebar-background: 22 47% 8%;
-    --sidebar-foreground: 38 60% 90%;
-    --sidebar-primary: 18 46% 55%;
-    --sidebar-primary-foreground: 22 47% 8%;
-    --sidebar-accent: 22 42% 15%;
-    --sidebar-accent-foreground: 38 60% 90%;
-    --sidebar-border: 38 60% 20%;
-    --sidebar-ring: 38 60% 63%;
+    --border: 45 60% 30%;
+    --input: 45 50% 25%;
+    --ring: 45 65% 53%;
+    --sidebar-background: 0 50% 8%;
+    --sidebar-foreground: 45 60% 90%;
+    --sidebar-primary: 0 95% 25%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 40% 15%;
+    --sidebar-accent-foreground: 45 60% 90%;
+    --sidebar-border: 45 60% 20%;
+    --sidebar-ring: 45 65% 53%;
   }
 }
 
@@ -148,7 +173,7 @@ All colors MUST be HSL.
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: hsl(var(--deep-earth-brown));
+    color: #650304;
     font-weight: 700;
     letter-spacing: -0.02em;
   }

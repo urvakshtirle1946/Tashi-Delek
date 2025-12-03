@@ -49,19 +49,19 @@ export default {
         },
         // Button colors
         "deep-earth-brown": "hsl(var(--deep-earth-brown))",
-        // Custom Monastery360 colors
+        // Custom Monastery360 colors - Updated with #650304 and #D3AF37
         monastery: {
-          gold: "hsl(var(--monastery-gold))",
-          "terracotta-red": "hsl(var(--terracotta-red))",
-          "deep-earth-brown": "hsl(var(--deep-earth-brown))",
-          "himalayan-maroon": "hsl(var(--himalayan-maroon))",
-          "soft-gold": "hsl(var(--soft-gold))",
-          "muted-mountain-brown": "hsl(var(--muted-mountain-brown))",
+          gold: "#D3AF37",
+          "terracotta-red": "#650304",
+          "deep-earth-brown": "#650304",
+          "himalayan-maroon": "#650304",
+          "soft-gold": "#D3AF37",
+          "muted-mountain-brown": "#8B6914",
           white: "hsl(var(--snow-white))",
           stone: "hsl(var(--temple-stone))",
           // Legacy mappings for backward compatibility
-          red: "hsl(var(--prayer-red))",
-          blue: "hsl(var(--mountain-blue))",
+          red: "#650304",
+          blue: "#650304",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -73,6 +73,9 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        handwritten: ["Kalam", "Comic Sans MS", "cursive"],
       },
       borderRadius: {
         lg: "var(--radius)",

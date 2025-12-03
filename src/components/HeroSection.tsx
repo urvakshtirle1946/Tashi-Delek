@@ -42,14 +42,12 @@ const HeroSection = () => {
 
           {/* Main Heading */}
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-deep-earth-brown leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-[#FFFFFF] to-[#FFD08A] bg-clip-text text-transparent leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
               Explore Sikkim's
               <br />
-              <span className="bg-gradient-to-r from-deep-earth-brown via-monastery-gold to-monastery-himalayan-maroon bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(255,255,255,0.5)]">
-                Sacred Heritage
-              </span>
+              Sacred Heritage
             </h1>
-            <p className="text-lg md:text-xl text-foreground max-w-3xl mx-auto leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] font-medium">
+            <p className="text-lg md:text-xl text-[#F5F5F5] max-w-3xl mx-auto leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] font-medium">
               Immerse yourself in 3D virtual tours of ancient monasteries, discover rich cultural traditions, 
               and plan your spiritual journey through the mystical lands of Sikkim.
             </p>
