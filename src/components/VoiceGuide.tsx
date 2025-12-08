@@ -442,17 +442,6 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
                 <Sparkles className="w-4 h-4 absolute top-2 right-2 text-amber-200 animate-pulse" />
               </Button>
 
-              {/* Label */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap"
-              >
-                <span className="bg-black/70 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full border border-white/10">
-                  🎙️ AI Guide
-                </span>
-              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

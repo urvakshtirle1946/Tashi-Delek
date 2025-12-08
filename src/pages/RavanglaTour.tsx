@@ -53,49 +53,49 @@ interface ModelProps {
   modelRef: React.RefObject<THREE.Group>;
 }
 
-// Hotspot data for Ravangla Buddha Park
+// Hotspot data for Ravangla Monastery
 const ravanglaHotspots = [
   {
     position: [0, 2.5, 2.5] as [number, number, number], // Front (Buddha head) - reduced height
     lineTarget: [0, 2.3, 0.5] as [number, number, number],
-    title: "Buddha Statue",
-    description: "Magnificent 130-ft statue of Shakyamuni Buddha, one of the tallest in India",
-    color: "#FFD700"
-  },
-  {
-    position: [-2.8, 0.8, 1.5] as [number, number, number], // Left front - reduced
-    lineTarget: [-1.2, 0.8, 0.6] as [number, number, number],
-    title: "Prayer Flags",
-    description: "Colorful prayer flags carrying blessings in the Himalayan breeze",
-    color: "#FF6B6B"
-  },
-  {
-    position: [2.8, 1.3, 0] as [number, number, number], // Right side - reduced
-    lineTarget: [1.2, 1.2, 0] as [number, number, number],
-    title: "Meditation Pavilion",
-    description: "Serene spot with panoramic views of Kanchenjunga",
-    color: "#4ECDC4"
-  },
-  {
-    position: [-1.2, -0.7, -2.8] as [number, number, number], // Bottom back left
-    lineTarget: [-0.4, 0, -1.1] as [number, number, number],
-    title: "Sacred Garden",
-    description: "Landscaped gardens representing Buddhist cosmology",
-    color: "#D3AF37"
+    title: "Main Prayer Hall (Assembly Hall / Lhakhang)",
+    description: "A grand, beautifully decorated hall with tall pillars, painted walls, and detailed Tibetan designs. Inside, you'll find large Buddha statues, thangkas, and traditional butter-lamp shelves",
+    color: "#EE4B2B"
   },
   {
     position: [2.2, 1.5, 1] as [number, number, number], // Right front - reduced
     lineTarget: [0.9, 1.8, 0.4] as [number, number, number],
-    title: "Replica Monasteries",
-    description: "Miniature replicas of major Sikkim monasteries",
-    color: "#95E1D3"
+    title: "Statues & Deities",
+    description: "The monastery houses impressive statues of Buddha, Guru Padmasambhava, and other Mahayana Buddhist deities. The craftsmanship is detailed and vibrant — especially on the main shrine altar",
+    color: "#EE4B2B"
+  },
+  {
+    position: [-2.8, 0.8, 1.5] as [number, number, number], // Left front - reduced
+    lineTarget: [-1.2, 0.8, 0.6] as [number, number, number],
+    title: "Murals, Thangkas & Artwork",
+    description: "The interior walls and ceilings are filled with colorful murals depicting Buddhist teachings, protector deities, and mandalas. The artwork represents Kagyu tradition styles and is visually rich",
+    color: "#EE4B2B"
+  },
+  {
+    position: [2.8, 1.3, 0] as [number, number, number], // Right side - reduced
+    lineTarget: [1.2, 1.2, 0] as [number, number, number],
+    title: "Prayer Wheel Corridor & Outer Courtyard",
+    description: "The monastery has long rows of prayer wheels where visitors can walk and spin them clockwise while chanting or silently praying. The courtyard is open and often used for ceremonies and festival dances",
+    color: "#EE4B2B"
+  },
+  {
+    position: [-1.2, -0.7, -2.8] as [number, number, number], // Bottom back left
+    lineTarget: [-0.4, 0, -1.1] as [number, number, number],
+    title: "Monks' Quarters & Living Areas",
+    description: "Around the monastery, you'll see areas where the monks live and train — often including a debate courtyard or learning rooms. The presence of young monks adds life and authenticity to the space",
+    color: "#EE4B2B"
   },
   {
     position: [1.5, -0.5, 2.5] as [number, number, number], // Bottom front right
     lineTarget: [0.5, 0, 1] as [number, number, number],
-    title: "Lotus Pond",
-    description: "Sacred water feature symbolizing purity and enlightenment",
-    color: "#66D9EF"
+    title: "Stupas & Small Shrines on the Grounds",
+    description: "There are stupas and smaller prayer structures around the complex, which add to the spiritual landscape and are nice to explore during a slow walk",
+    color: "#EE4B2B"
   }
 ];
 

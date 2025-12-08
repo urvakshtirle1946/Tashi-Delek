@@ -58,37 +58,44 @@ const pelingHotspots = [
   {
     position: [0, 1.5, 2.5] as [number, number, number], // Front - reduced height
     lineTarget: [0, 1.4, 0.7] as [number, number, number],
-    title: "Main Temple",
-    description: "Historic prayer hall with ancient murals and thangka paintings",
-    color: "#D3AF37"
-  },
-  {
-    position: [-2.5, 0.8, 1.5] as [number, number, number], // Left front - reduced
-    lineTarget: [-1, 0.7, 0.5] as [number, number, number],
-    title: "Scripture Library",
-    description: "Rare collection of Buddhist texts and manuscripts",
-    color: "#FF6B6B"
+    title: "Main Prayer Hall (Dukhang / Lakhang)",
+    description: "The ground floor houses the central temple hall, with beautifully painted doors/windows, walls decorated in traditional Tibetan-style motifs, and a central statue of a Buddha",
+    color: "#EE4B2B"
   },
   {
     position: [2.5, 1.3, 0] as [number, number, number], // Right side - reduced
     lineTarget: [1.1, 1.2, 0] as [number, number, number],
-    title: "Meditation Chamber",
-    description: "Peaceful space for monks' meditation and spiritual practice",
-    color: "#4ECDC4"
+    title: "Location",
+    description: "Located near Pelling in West Sikkim, the monastery sits at an elevation of around 2,085 meters. From its hilltop setting, it offers spectacular views of Mount Khangchendzonga and surrounding forested valleys, creating a peaceful and sacred mountain environment",
+    color: "#EE4B2B"
   },
   {
-    position: [-0.8, -0.7, -2.5] as [number, number, number], // Bottom back
-    lineTarget: [-0.2, 0, -1] as [number, number, number],
-    title: "Courtyard",
-    description: "Central gathering space for ceremonies and festivals",
-    color: "#FFD700"
+    position: [-2.5, 0.8, 1.5] as [number, number, number], // Left front - reduced
+    lineTarget: [-1, 0.7, 0.5] as [number, number, number],
+    title: "Statues & Antique Idols",
+    description: "On various floors, you'll find numerous statues of saints and \"Rinpoches,\" including a main statue of Padmasambhava. The monastery also preserves ancient idols and scriptures. Upstairs, there are fierce–form statues representing Padmasambhava's eight incarnations",
+    color: "#EE4B2B"
   },
   {
     position: [2, -0.5, 2.2] as [number, number, number], // Bottom right front
     lineTarget: [0.8, 0.1, 0.9] as [number, number, number],
-    title: "Garden Path",
-    description: "Scenic pathway through monastery grounds",
-    color: "#95E1D3"
+    title: "Top-Floor Wooden Masterpiece — the Heavenly Palace (Zangdok Palri / Sanghthokpalri)",
+    description: "On the top floor sits a seven-tiered, colorfully painted and intricately carved wooden structure representing the \"Heavenly Palace\" of Guru Rinpoche — a rare and beautiful piece of religious art",
+    color: "#EE4B2B"
+  },
+  {
+    position: [-0.8, -0.7, -2.5] as [number, number, number], // Bottom back
+    lineTarget: [-0.2, 0, -1] as [number, number, number],
+    title: "Painted Murals & Traditional Artwork (Walls, Ceilings, Doors)",
+    description: "The monastery's interiors are adorned with vibrant paintings, Tibetan-style motifs, and wall art depicting deities, religious themes, angels and Bodhisattvas",
+    color: "#EE4B2B"
+  },
+  {
+    position: [0.5, -0.5, -2.2] as [number, number, number], // Bottom back right
+    lineTarget: [0.2, 0.1, -0.9] as [number, number, number],
+    title: "Exterior",
+    description: "The outside areas include an open courtyard used for rituals and Cham mask dances during festivals such as Losar and Pang Lhabsol. Prayer flags, stone pathways, and carved wooden elements decorate the surroundings, while the architecture reflects traditional Tibetan and Sikkimese craftsmanship",
+    color: "#EE4B2B"
   }
 ];
 
