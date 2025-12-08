@@ -5,7 +5,7 @@ const InteractiveMapPage = () => {
     <div className="fixed inset-0 w-full h-full">
       <GoogleMapComponent />
     </div>
-  );
+  )
 };
 
 export default InteractiveMapPage;

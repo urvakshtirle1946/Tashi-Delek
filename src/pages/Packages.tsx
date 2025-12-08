@@ -7,11 +7,13 @@ import MuteButton from "@/components/MuteButton";
 import { CreativePricing } from "@/components/ui/creative-pricing";
 import type { PricingTier } from "@/components/ui/creative-pricing";
 import { packageAPI } from "@/lib/api";
+import PackagesChatbot from "@/components/PackagesChatbot";
 
 const TravelPackagesPage = () => {
   const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [packagesData, setPackagesData] = useState<any[]>([]);
 
   // Icon mapping based on category
   const getCategoryIcon = (category: string) => {
@@ -54,6 +56,9 @@ const TravelPackagesPage = () => {
       const response = await packageAPI.getAll({ limit: 100 }); // Get all packages
       
       if (response.success && response.data.packages) {
+        // Store raw packages data for chatbot
+        setPackagesData(response.data.packages.filter((pkg: any) => pkg.status === 'ACTIVE'));
+        
         // Transform backend packages to PricingTier format
         const transformedPackages: PricingTier[] = response.data.packages
           .filter((pkg: any) => pkg.status === 'ACTIVE') // Only show active packages
@@ -221,6 +226,15 @@ const TravelPackagesPage = () => {
           </div>
         </section>
       </main>
+      
+      {/* Chatbot at bottom - Always visible */}
+      <PackagesChatbot 
+        packages={packagesData.length > 0 ? packagesData.map(pkg => ({
+          name: pkg.packageName || 'Travel Package',
+          price: pkg.price || 0,
+          description: pkg.description?.substring(0, 100) || `Explore ${pkg.location}`,
+        })) : []} 
+      />
     </div>
   );
 };
