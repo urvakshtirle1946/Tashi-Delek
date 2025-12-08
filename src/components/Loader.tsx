@@ -87,7 +87,7 @@ const Loader = ({ onComplete }: LoaderProps) => {
         ref={videoRef}
         className="w-full h-full object-cover"
         playsInline
-        preload="auto"
+        preload="metadata"
         autoPlay
         muted
       >

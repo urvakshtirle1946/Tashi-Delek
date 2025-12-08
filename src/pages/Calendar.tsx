@@ -1,85 +1,58 @@
+import { ArrowRight, ArrowLeft, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, Users, Bell, Star, ArrowLeft, Plus, Download } from "lucide-react";
 import MuteButton from "@/components/MuteButton";
 
 const CulturalCalendarPage = () => {
-  const events = [
+  const festivals = [
     {
       id: 1,
       title: "Losar Festival",
-      description: "Tibetan New Year celebrations with traditional dances and prayers",
-      date: "Feb 15-17, 2024",
-      time: "6:00 AM - 8:00 PM",
-      location: "Rumtek Monastery",
-      type: "Festival",
-      attendees: "500+",
-      isHighlighted: true
+      description: "Tibetan New Year celebrations with traditional dances, prayers, and vibrant monastery decorations marking the beginning of spring.",
+      image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80",
+      imageAlt: "Colorful Losar Festival celebration with prayer flags"
     },
     {
       id: 2,
       title: "Saga Dawa",
-      description: "Buddha's birth, enlightenment, and parinirvana commemoration",
-      date: "May 23, 2024",
-      time: "5:00 AM - 7:00 PM",
-      location: "Multiple Monasteries",
-      type: "Religious",
-      attendees: "1000+",
-      isHighlighted: true
+      description: "Sacred Buddhist festival commemorating Buddha's birth, enlightenment, and parinirvana celebrated with grand ceremonies at monasteries.",
+      image: "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&q=80",
+      imageAlt: "Buddhist monks in prayer during Saga Dawa"
     },
     {
       id: 3,
       title: "Pang Lhabsol",
-      description: "Worship of Mount Khangchendzonga guardian deity",
-      date: "Sep 18, 2024",
-      time: "Morning Prayers",
-      location: "Pemayangtse Monastery",
-      type: "Ceremony",
-      attendees: "300+",
-      isHighlighted: false
+      description: "Unique Sikkimese festival worshipping Mount Khangchendzonga with warrior dances and ceremonial offerings to the mountain deity.",
+      image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&q=80",
+      imageAlt: "Traditional warrior dance performance at Pang Lhabsol"
     },
     {
       id: 4,
+      title: "Bumchu Festival",
+      description: "Sacred water vessel ceremony at Tashiding Monastery where holy water predicts the year's fortune for the entire region.",
+      image: "https://images.unsplash.com/photo-1605519295292-f6e66af07a00?w=800&q=80",
+      imageAlt: "Sacred Bumchu ceremony at Tashiding Monastery"
+    },
+    {
+      id: 5,
+      title: "Losoong Festival",
+      description: "Sikkimese New Year celebration with traditional Chaam dances, archery competitions, and cultural performances throughout the state.",
+      image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800&q=80",
+      imageAlt: "Traditional Chaam dance during Losoong"
+    },
+    {
+      id: 6,
       title: "Dashain Festival",
-      description: "Traditional harvest festival with cultural performances",
-      date: "Oct 3-12, 2024",
-      time: "All Day",
-      location: "Various Locations",
-      type: "Festival",
-      attendees: "2000+",
-      isHighlighted: false
+      description: "Harvest festival celebrating victory of good over evil with elaborate rituals, family gatherings, and cultural festivities across Sikkim.",
+      image: "https://images.unsplash.com/photo-1583339793403-3d9b001b6008?w=800&q=80",
+      imageAlt: "Colorful Dashain celebrations in Sikkim"
     }
   ];
-
-  const upcomingEvents = [
-    { name: "Morning Prayers", time: "Daily 5:30 AM", location: "All Monasteries" },
-    { name: "Evening Prayers", time: "Daily 6:00 PM", location: "All Monasteries" },
-    { name: "Weekend Meditation", time: "Sat-Sun 7:00 AM", location: "Enchey Monastery" },
-    { name: "Cultural Tours", time: "Mon-Fri 10:00 AM", location: "Guided Tours Available" }
-  ];
-
-  const handleJoinEvent = (eventId: number) => {
-    const event = events.find(e => e.id === eventId);
-    alert(`Joining event: ${event?.title}! You'll receive notifications and updates.`);
-  };
-
-  const handleAddToCalendar = (eventId: number) => {
-    const event = events.find(e => e.id === eventId);
-    alert(`Adding ${event?.title} to your calendar!`);
-  };
-
-  const handleNotifications = () => {
-    alert("Setting up event notifications! You'll be notified before each event.");
-  };
-
-  const handleDownloadCalendar = () => {
-    alert("Downloading complete cultural calendar for offline access!");
-  };
 
   return (
     <div className="min-h-screen">
       <MuteButton position="bottom-left" />
+      
       <main className="pt-24">
         {/* Header */}
         <section className="py-12 -mt-24 sm:-mt-28 bg-gradient-to-b from-secondary/30 to-background">
@@ -93,198 +66,83 @@ const CulturalCalendarPage = () => {
               </Button>
             </div>
 
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <Badge className="mb-4 bg-monastery-red/10 text-monastery-red hover:bg-monastery-red/20">
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <Badge className="mb-4 bg-[#D3AF37]/10 text-[#650304] hover:bg-[#D3AF37]/20 border-[#D3AF37]/30">
                 <Calendar className="w-3 h-3 mr-2" />
                 Sacred Celebrations
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
                 Cultural
-                <span className="bg-gradient-to-r from-monastery-red to-primary bg-clip-text text-transparent"> Calendar</span>
+                <span className="bg-gradient-to-r from-[#650304] to-[#D3AF37] bg-clip-text text-transparent"> Calendar</span>
               </h1>
               <p className="text-lg text-muted-foreground">
-                Stay connected with Sikkim's spiritual rhythm. Join festivals, ceremonies, and daily practices 
-                that have been celebrated for centuries in these sacred spaces.
+                Experience the rich tapestry of Sikkim's festivals and celebrations throughout the year. 
+                Join us in honoring centuries-old traditions and spiritual practices.
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Main Events */}
-              <div className="lg:col-span-2 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold text-foreground">Upcoming Festivals & Events</h2>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleNotifications}
-                    >
-                      <Bell className="w-4 h-4 mr-2" />
-                      Notifications
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleDownloadCalendar}
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
+            {/* Zigzag Festival Cards */}
+            <div className="space-y-24 max-w-6xl mx-auto">
+              {festivals.map((festival, index) => {
+                const isImageLeft = index % 2 === 0;
+                
+                return (
+                  <div 
+                    key={festival.id}
+                    className={`flex flex-col ${
+                      isImageLeft ? 'lg:flex-row' : 'lg:flex-row-reverse'
+                    } gap-12 items-center`}
+                  >
+                    {/* Image Section */}
+                    <div className="w-full lg:w-1/2">
+                      <div className="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-[var(--transition-monastery)] border-2 border-[#D3AF37]/20">
+                        <img 
+                          src={festival.image} 
+                          alt={festival.imageAlt}
+                          loading="lazy"
+                          className="w-full h-[400px] object-cover transform hover:scale-105 transition-[var(--transition-monastery)]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Text Section */}
+                    <div className="w-full lg:w-1/2 space-y-6">
+                      <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#650304' }}>
+                        {festival.title}
+                      </h2>
+                      <p className="text-lg text-muted-foreground leading-relaxed">
+                        {festival.description}
+                      </p>
+                      <a 
+                        href="#"
+                        className="inline-flex items-center font-medium text-lg group transition-[var(--transition-gentle)] hover:opacity-80"
+                        style={{ color: '#650304' }}
+                      >
+                        Learn more 
+                        <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    </div>
                   </div>
-                </div>
-
-                {events.map((event) => (
-                  <Card key={event.id} className={`border-0 transition-[var(--transition-monastery)] ${
-                    event.isHighlighted 
-                      ? 'bg-gradient-to-r from-monastery-red/5 to-primary/5 shadow-monastery' 
-                      : 'bg-card/80 backdrop-blur-sm hover:shadow-gentle'
-                  }`}>
-                    <CardHeader className="pb-4">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <CardTitle className="text-lg">{event.title}</CardTitle>
-                            {event.isHighlighted && (
-                              <Badge className="bg-monastery-red text-primary-foreground">
-                                <Star className="w-3 h-3 mr-1" />
-                                Featured
-                              </Badge>
-                            )}
-                          </div>
-                          <CardDescription className="text-sm">{event.description}</CardDescription>
-                        </div>
-                        <Badge variant="secondary">
-                          {event.type}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid sm:grid-cols-2 gap-4 text-sm mb-4">
-                        <div className="flex items-center space-x-2 text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
-                          <span>{event.date}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-muted-foreground">
-                          <Clock className="w-4 h-4" />
-                          <span>{event.time}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-muted-foreground">
-                          <MapPin className="w-4 h-4" />
-                          <span>{event.location}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-muted-foreground">
-                          <Users className="w-4 h-4" />
-                          <span>{event.attendees} Expected</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <Button 
-                          size="sm" 
-                          className="bg-gradient-to-r from-monastery-red to-primary"
-                          onClick={() => handleJoinEvent(event.id)}
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          Join Event
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleAddToCalendar(event.id)}
-                        >
-                          <Calendar className="w-4 h-4 mr-1" />
-                          Add to Calendar
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Daily Schedule */}
-                <Card className="border-0 bg-card/80 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Daily Activities</CardTitle>
-                    <CardDescription>Regular monastery schedules</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {upcomingEvents.map((event, index) => (
-                      <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-secondary/50 hover:bg-secondary/70 transition-colors cursor-pointer"
-                        onClick={() => alert(`Info about: ${event.name}`)}>
-                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                        <div className="flex-1 space-y-1">
-                          <div className="font-medium text-sm text-foreground">{event.name}</div>
-                          <div className="text-xs text-muted-foreground">{event.time}</div>
-                          <div className="text-xs text-muted-foreground">{event.location}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="border-0 bg-gradient-to-br from-monastery-blue/10 to-primary/10">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Quick Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button 
-                      className="w-full justify-start" 
-                      variant="ghost"
-                      onClick={() => alert("Opening calendar export options")}
-                    >
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Export Calendar
-                    </Button>
-                    <Button 
-                      className="w-full justify-start" 
-                      variant="ghost"
-                      onClick={() => alert("Setting up event reminders")}
-                    >
-                      <Bell className="w-4 h-4 mr-2" />
-                      Event Reminders
-                    </Button>
-                    <Button 
-                      className="w-full justify-start" 
-                      variant="ghost"
-                      onClick={() => alert("Viewing event locations on map")}
-                    >
-                      <MapPin className="w-4 h-4 mr-2" />
-                      Event Locations
-                    </Button>
-                    <Button 
-                      className="w-full bg-gradient-to-r from-monastery-blue to-primary"
-                      onClick={() => alert("Opening full calendar view")}
-                    >
-                      View Full Calendar
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
+                );
+              })}
             </div>
 
-            {/* Monthly Overview */}
-            <div className="mt-20">
-              <h3 className="text-2xl font-bold text-center text-foreground mb-8">This Month's Highlights</h3>
-              <div className="grid md:grid-cols-4 gap-4">
-                <Card className="p-6 text-center border-0 bg-card/60">
-                  <h4 className="font-semibold mb-2 text-2xl text-primary">12</h4>
-                  <p className="text-sm text-muted-foreground">Festival Days</p>
-                </Card>
-                <Card className="p-6 text-center border-0 bg-card/60">
-                  <h4 className="font-semibold mb-2 text-2xl text-monastery-gold">25</h4>
-                  <p className="text-sm text-muted-foreground">Daily Prayers</p>
-                </Card>
-                <Card className="p-6 text-center border-0 bg-card/60">
-                  <h4 className="font-semibold mb-2 text-2xl text-monastery-blue">8</h4>
-                  <p className="text-sm text-muted-foreground">Special Ceremonies</p>
-                </Card>
-                <Card className="p-6 text-center border-0 bg-card/60">
-                  <h4 className="font-semibold mb-2 text-2xl text-monastery-red">200+</h4>
-                  <p className="text-sm text-muted-foreground">Participants</p>
-                </Card>
-              </div>
+            {/* Bottom CTA Section */}
+            <div className="mt-32 text-center py-16 px-8 bg-gradient-to-br from-[#D3AF37]/10 to-[#650304]/5 rounded-3xl shadow-xl max-w-4xl mx-auto border-2 border-[#D3AF37]/20">
+              <h3 className="text-3xl font-bold mb-4" style={{ color: '#650304' }}>
+                Plan Your Visit
+              </h3>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Don't miss out on these incredible cultural experiences. 
+                Contact us to plan your trip around Sikkim's most vibrant festivals.
+              </p>
+              <Button 
+                size="lg"
+                className="px-8 py-6 text-lg rounded-xl shadow-xl hover:shadow-2xl transition-[var(--transition-monastery)] text-white hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, #650304 0%, #D3AF37 100%)' }}
+              >
+                Get in Touch
+              </Button>
             </div>
           </div>
         </section>

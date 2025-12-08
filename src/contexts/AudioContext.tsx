@@ -59,7 +59,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AudioContext.Provider value={{ audioRef, isMuted, setIsMuted, toggleMute, startAudio }}>
-      <audio ref={audioRef} src="/assets/Prayer.mp3" preload="auto" />
+      <audio ref={audioRef} src="/assets/Prayer.mp3" preload="none" />
       {children}
     </AudioContext.Provider>
   );

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AudioProvider } from "@/contexts/AudioContext";
 import Loader from "@/components/Loader";
 import Navigation from "@/components/Navigation";
+import SmoothScroll from "@/components/SmoothScroll";
 import Index from "./pages/Index";
 import VirtualTours from "./pages/VirtualTours";
 import RumtekTour from "./pages/RumtekTour";
@@ -53,6 +54,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <SmoothScroll />
         {showLoader && <Loader onComplete={() => setShowLoader(false)} />}
         <BrowserRouter
           future={{
