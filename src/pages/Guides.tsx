@@ -1,54 +1,93 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, ArrowLeft, Star, Clock, MapPin, Languages, BookOpen, MessageCircle } from "lucide-react";
+import { Users, ArrowLeft, Star, Clock, MapPin, Languages, BookOpen, MessageCircle, Loader2 } from "lucide-react";
 import MuteButton from "@/components/MuteButton";
+import { vendorAPI } from "@/lib/api";
+
+interface Vendor {
+  id: string;
+  name: string;
+  businessName: string;
+  email: string;
+  phone?: string;
+  photo?: any;
+  verificationStatus: string;
+  createdAt: string;
+  stats?: {
+    packages: number;
+    bookings: number;
+    rating: number;
+  };
+}
 
 const GuidesPage = () => {
-  const [selectedGuide, setSelectedGuide] = useState<number | null>(null);
+  const [selectedGuide, setSelectedGuide] = useState<string | null>(null);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const guides = [
-    {
-      id: 1,
-      name: "Tenzin Norbu",
-      specialization: "Buddhist Philosophy",
-      rating: 4.9,
-      reviews: 156,
-      languages: ["English", "Hindi", "Tibetan"],
-      experience: "15 years",
-      location: "Gangtok",
-      price: "₹2,500/day",
-      expertise: ["Monastery History", "Meditation", "Cultural Ceremonies"],
-      image: "/api/placeholder/150/150"
-    },
-    {
-      id: 2,
-      name: "Pemba Sherpa",
-      specialization: "Cultural Heritage",
-      rating: 4.8,
-      reviews: 134,
-      languages: ["English", "Nepali", "Hindi"],
-      experience: "12 years",
-      location: "Pelling",
-      price: "₹2,000/day",
-      expertise: ["Architecture", "Local Traditions", "Photography"],
-      image: "/api/placeholder/150/150"
-    },
-    {
-      id: 3,
-      name: "Lhakpa Dolma",
-      specialization: "Spiritual Practices",
-      rating: 5.0,
-      reviews: 89,
-      languages: ["English", "Tibetan", "Hindi"],
-      experience: "18 years",
-      location: "Yuksom",
-      price: "₹3,000/day",
-      expertise: ["Sacred Rituals", "Meditation Teaching", "Pilgrim Routes"],
-      image: "/api/placeholder/150/150"
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  const fetchVendors = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await vendorAPI.getAll({ limit: 100 });
+      
+      if (response.success && response.data.vendors) {
+        setVendors(response.data.vendors);
+      }
+    } catch (err: any) {
+      console.error('Error fetching vendors:', err);
+      setError(err.message || 'Failed to load guides');
+      // Fallback to empty array or default guides
+      setVendors([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Transform vendor data to guide format
+  const transformVendorToGuide = (vendor: Vendor, index: number) => {
+    const photoUrl = vendor.photo 
+      ? (typeof vendor.photo === 'string' ? vendor.photo : vendor.photo.url)
+      : '/api/placeholder/150/150';
+    
+    // Calculate experience based on creation date (mock)
+    const yearsSinceJoin = Math.floor((new Date().getTime() - new Date(vendor.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365));
+    const experience = yearsSinceJoin > 0 ? `${yearsSinceJoin} years` : 'New guide';
+    
+    // Default values for missing data
+    const rating = vendor.stats?.rating || 4.5 + (index % 3) * 0.2; // Mock rating between 4.5-5.0
+    const reviews = vendor.stats?.bookings || Math.floor(Math.random() * 100) + 50;
+    
+    return {
+      id: vendor.id,
+      name: vendor.name,
+      specialization: vendor.businessName || 'Tour Guide',
+      rating: parseFloat(rating.toFixed(1)),
+      reviews: reviews,
+      languages: ['English', 'Hindi', 'Local'], // Default languages
+      experience: experience,
+      location: 'Sikkim', // Default location
+      price: `₹${Math.floor(Math.random() * 2000) + 1500}/day`, // Mock price
+      expertise: [
+        vendor.stats?.packages ? `${vendor.stats.packages} Packages` : 'Tour Packages',
+        'Local Knowledge',
+        'Cultural Heritage'
+      ],
+      image: photoUrl,
+      email: vendor.email,
+      phone: vendor.phone,
+      verificationStatus: vendor.verificationStatus
+    };
+  };
+
+  const guides = vendors.map((vendor, index) => transformVendorToGuide(vendor, index));
 
   const tourTypes = [
     {
@@ -71,20 +110,21 @@ const GuidesPage = () => {
     }
   ];
 
-  const handleBookGuide = (guideId: number) => {
+  const handleBookGuide = (guideId: string) => {
     const guide = guides.find(g => g.id === guideId);
     setSelectedGuide(guideId);
     alert(`Booking ${guide?.name}! They will contact you to schedule your monastery tour.`);
   };
 
-  const handleVirtualTour = (guideId: number) => {
+  const handleVirtualTour = (guideId: string) => {
     const guide = guides.find(g => g.id === guideId);
     alert(`Starting virtual tour with ${guide?.name}! Connecting to video call...`);
   };
 
-  const handleMessage = (guideId: number) => {
+  const handleMessage = (guideId: string) => {
     const guide = guides.find(g => g.id === guideId);
-    alert(`Opening chat with ${guide?.name}! Ask them about availability and tour preferences.`);
+    const contactInfo = guide?.email || guide?.phone || 'N/A';
+    alert(`Contact ${guide?.name} at ${contactInfo}. Ask them about availability and tour preferences.`);
   };
 
   return (
@@ -145,18 +185,39 @@ const GuidesPage = () => {
             </div>
 
             {/* Guides Grid */}
-            <div className="grid lg:grid-cols-3 gap-8">
-              {guides.map((guide) => (
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Loading guides...</span>
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-destructive mb-4">{error}</p>
+                <Button onClick={fetchVendors} variant="outline">
+                  Retry
+                </Button>
+              </div>
+            ) : guides.length > 0 ? (
+              <div className="grid lg:grid-cols-3 gap-8">
+                {guides.map((guide) => (
                 <Card key={guide.id} className={`group hover:shadow-monastery transition-[var(--transition-monastery)] border-0 bg-card/80 backdrop-blur-sm overflow-hidden ${
                   selectedGuide === guide.id ? 'ring-2 ring-primary' : ''
                 }`}>
                   <CardHeader className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden relative">
                       <img 
                         src={guide.image} 
                         alt={guide.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/api/placeholder/150/150';
+                        }}
                       />
+                      {guide.verificationStatus === 'VERIFIED' && (
+                        <Badge className="absolute bottom-0 right-0 bg-green-500 text-white text-xs px-1.5 py-0.5">
+                          ✓ Verified
+                        </Badge>
+                      )}
                     </div>
                     <CardTitle className="text-lg">{guide.name}</CardTitle>
                     <CardDescription>{guide.specialization}</CardDescription>
@@ -239,8 +300,9 @@ const GuidesPage = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : null}
 
             {/* Benefits Section */}
             <div className="mt-20 text-center">

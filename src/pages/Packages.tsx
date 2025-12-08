@@ -1,61 +1,122 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, Phone, Compass, Mountain, Sparkles } from "lucide-react";
+import { ArrowLeft, Heart, Phone, Compass, Mountain, Sparkles, Loader2 } from "lucide-react";
 import MuteButton from "@/components/MuteButton";
 import { CreativePricing } from "@/components/ui/creative-pricing";
 import type { PricingTier } from "@/components/ui/creative-pricing";
+import { packageAPI } from "@/lib/api";
 
 const TravelPackagesPage = () => {
+  const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const pricingTiers: PricingTier[] = [
-    {
-      name: "Spiritual Discovery",
-      icon: <Compass className="w-6 h-6" />,
-      price: 12999,
-      description: "Perfect for first-time monastery explorers",
-      color: "amber",
-      features: [
-        "3 Days / 2 Nights Stay",
-        "Visit 5 Major Monasteries",
-        "Traditional Accommodation",
-        "Local Guide Included",
-        "Cultural Performances",
-        "All Meals Included",
-      ],
-    },
-    {
-      name: "Heritage Explorer",
-      icon: <Mountain className="w-6 h-6" />,
-      price: 28999,
-      description: "For serious cultural enthusiasts",
-      color: "blue",
-      features: [
-        "7 Days / 6 Nights Stay",
-        "Complete Sikkim Circuit",
-        "Luxury Mountain Resorts",
-        "Photography Workshops",
-        "Meditation Sessions",
-        "Private Transport",
-      ],
-      popular: true,
-    },
-    {
-      name: "Monastery Retreat",
-      icon: <Sparkles className="w-6 h-6" />,
-      price: 18999,
-      description: "For spiritual seekers",
-      color: "purple",
-      features: [
-        "5 Days / 4 Nights Stay",
-        "Stay in Monastery",
-        "Meditation Training",
-        "Monk Interactions",
-        "Spiritual Guidance",
-        "Vegetarian Meals",
-      ],
-    },
-  ];
+  // Icon mapping based on category
+  const getCategoryIcon = (category: string) => {
+    const iconMap: { [key: string]: React.ReactNode } = {
+      'ADVENTURE': <Mountain className="w-6 h-6" />,
+      'BEACH': <Compass className="w-6 h-6" />,
+      'HERITAGE': <Mountain className="w-6 h-6" />,
+      'WILDLIFE': <Mountain className="w-6 h-6" />,
+      'HILLSTATION': <Mountain className="w-6 h-6" />,
+      'PILGRIMAGE': <Compass className="w-6 h-6" />,
+      'CULTURAL': <Sparkles className="w-6 h-6" />,
+      'HONEYMOON': <Heart className="w-6 h-6" />,
+    };
+    return iconMap[category] || <Compass className="w-6 h-6" />;
+  };
+
+  // Color mapping based on category
+  const getCategoryColor = (category: string) => {
+    const colorMap: { [key: string]: string } = {
+      'ADVENTURE': 'blue',
+      'BEACH': 'blue',
+      'HERITAGE': 'amber',
+      'WILDLIFE': 'green',
+      'HILLSTATION': 'purple',
+      'PILGRIMAGE': 'amber',
+      'CULTURAL': 'purple',
+      'HONEYMOON': 'pink',
+    };
+    return colorMap[category] || 'blue';
+  };
+
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await packageAPI.getAll({ limit: 100 }); // Get all packages
+      
+      if (response.success && response.data.packages) {
+        // Transform backend packages to PricingTier format
+        const transformedPackages: PricingTier[] = response.data.packages
+          .filter((pkg: any) => pkg.status === 'ACTIVE') // Only show active packages
+          .map((pkg: any, index: number) => {
+            // Parse features from description or use default
+            const features = pkg.description
+              ? pkg.description.split('\n').filter((line: string) => line.trim()).slice(0, 6)
+              : [
+                  `${pkg.duration || 'Custom Duration'}`,
+                  `Visit ${pkg.location}`,
+                  'Professional Guide',
+                  'All Meals Included',
+                  'Transportation',
+                  '24/7 Support'
+                ];
+
+            return {
+              name: pkg.packageName || 'Travel Package',
+              icon: getCategoryIcon(pkg.category || 'ADVENTURE'),
+              price: pkg.price || 0,
+              description: pkg.description?.substring(0, 100) || `Explore ${pkg.location}`,
+              color: getCategoryColor(pkg.category || 'ADVENTURE'),
+              features: features.length > 0 ? features : ['Package details available'],
+              popular: index === 1, // Make second package popular
+            };
+          });
+
+        setPricingTiers(transformedPackages);
+      }
+    } catch (err: any) {
+      console.error('Error fetching packages:', err);
+      const errorMessage = err.message || 'Failed to load packages';
+      setError(errorMessage);
+      
+      // Show more helpful error message
+      if (errorMessage.includes('Cannot connect to backend')) {
+        setError('Backend server is not running. Please start the backend server on port 8000.');
+      } else {
+        setError(errorMessage);
+      }
+      
+      // Fallback to default packages if API fails
+      setPricingTiers([
+        {
+          name: "Spiritual Discovery",
+          icon: <Compass className="w-6 h-6" />,
+          price: 12999,
+          description: "Perfect for first-time monastery explorers",
+          color: "amber",
+          features: [
+            "3 Days / 2 Nights Stay",
+            "Visit 5 Major Monasteries",
+            "Traditional Accommodation",
+            "Local Guide Included",
+            "Cultural Performances",
+            "All Meals Included",
+          ],
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCustomizePackage = () => {
     alert(`Let us know your preferences and we'll tailor the perfect package for you!`);
@@ -83,12 +144,30 @@ const TravelPackagesPage = () => {
 
             {/* Creative Pricing Section */}
             <div className="mb-16">
-              <CreativePricing
-                tag="Curated Experiences"
-                title="Journey Through Sacred Himalayan Monasteries"
-                description="Immerse yourself in Sikkim's spiritual heritage with our handpicked packages"
-                tiers={pricingTiers}
-              />
+              {loading ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-3 text-muted-foreground">Loading packages...</span>
+                </div>
+              ) : error ? (
+                <div className="text-center py-20">
+                  <p className="text-destructive mb-4">{error}</p>
+                  <Button onClick={fetchPackages} variant="outline">
+                    Retry
+                  </Button>
+                </div>
+              ) : pricingTiers.length > 0 ? (
+                <CreativePricing
+                  tag="Curated Experiences"
+                  title="Journey Through Sacred Himalayan Monasteries"
+                  description="Immerse yourself in Sikkim's spiritual heritage with our handpicked packages"
+                  tiers={pricingTiers}
+                />
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-muted-foreground">No packages available at the moment.</p>
+                </div>
+              )}
             </div>
 
             {/* CTA Section */}
