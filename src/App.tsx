@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { LoadScript } from "@react-google-maps/api";
 import { AudioProvider } from "@/contexts/AudioContext";
 import Loader from "@/components/Loader";
 import Navigation from "@/components/Navigation";
@@ -22,6 +23,7 @@ import FoodPage from "./pages/Food";
 import GuidesPage from "./pages/Guides";
 import CommunityPage from "./pages/Community";
 import NotFound from "./pages/NotFound";
+import { GOOGLE_MAPS_API_KEY, GOOGLE_LIBRARIES } from "@/components/ui/google-map";
 
 // Component to conditionally render Navigation
 const ConditionalNavigation = () => {
@@ -57,31 +59,36 @@ const App = () => {
         <Sonner />
         <SmoothScroll />
         {showLoader && <Loader onComplete={() => setShowLoader(false)} />}
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
+        {/* LoadScript moved to App level to prevent re-initialization and Street View 429 errors */}
+        <LoadScript
+          googleMapsApiKey={GOOGLE_MAPS_API_KEY}
+          libraries={GOOGLE_LIBRARIES}
         >
-          <ConditionalNavigation />
-          <OfflineIndicator />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/tours" element={<VirtualTours />} />
-            <Route path="/tours/rumtek" element={<RumtekTour />} />
-            <Route path="/tours/enchey" element={<EncheyTour />} />
-            <Route path="/tours/pelinggumpa" element={<PelingGumpaTour />} />
-            <Route path="/tours/phodong" element={<PhodongTour />} />
-            <Route path="/tours/ravangla" element={<RavanglaTour />} />
-            <Route path="/map" element={<InteractiveMapPage />} />
-            <Route path="/calendar" element={<CulturalCalendarPage />} />
-            <Route path="/packages" element={<TravelPackagesPage />} />
-            <Route path="/food" element={<FoodPage />} />
-            <Route path="/guides" element={<GuidesPage />} />
-            <Route path="/archives" element={<CommunityPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
+            <ConditionalNavigation />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/tours" element={<VirtualTours />} />
+              <Route path="/tours/rumtek" element={<RumtekTour />} />
+              <Route path="/tours/enchey" element={<EncheyTour />} />
+              <Route path="/tours/pelinggumpa" element={<PelingGumpaTour />} />
+              <Route path="/tours/phodong" element={<PhodongTour />} />
+              <Route path="/tours/ravangla" element={<RavanglaTour />} />
+              <Route path="/map" element={<InteractiveMapPage />} />
+              <Route path="/calendar" element={<CulturalCalendarPage />} />
+              <Route path="/packages" element={<TravelPackagesPage />} />
+              <Route path="/food" element={<FoodPage />} />
+              <Route path="/guides" element={<GuidesPage />} />
+              <Route path="/archives" element={<CommunityPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </LoadScript>
       </TooltipProvider>
     </AudioProvider>
   );
