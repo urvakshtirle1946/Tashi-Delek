@@ -1,8 +1,12 @@
 import { useMemo, useCallback, useRef, useEffect, useState, memo } from 'react';
 import { GoogleMap, Polygon } from '@react-google-maps/api';
+import { Viewer } from '@photo-sphere-viewer/core';
+import '@photo-sphere-viewer/core/index.css';
+import { Viewer as MapillaryViewer } from 'mapillary-js';
+import 'mapillary-js/dist/mapillary.css';
 
 // Export constants for use in App.tsx LoadScript
-export const GOOGLE_MAPS_API_KEY = 'AIzaSyD7hwFvGbx4CASdblx-mQP-DefCVS36RV0';
+export const GOOGLE_MAPS_API_KEY = 'AIzaSyA5Nl4L4FLicH5i8sdpyJHyMIbDpDs45_I';
 
 // Move libraries array outside component to prevent LoadScript reloading
 // React treats new arrays as different references, causing unnecessary reloads
@@ -38,7 +42,7 @@ const SIKKIM_POLYGON_PATH = [
 
 // Map ID is REQUIRED for Advanced Markers to work
 // Using provided Map ID to help resolve 429 error issues
-const GOOGLE_MAP_ID = 'cbf154d6132a7b8ea6638884';
+const GOOGLE_MAP_ID = 'bb30942387f26fc2328895ea';
 
 interface Monastery {
   id: string;
@@ -46,6 +50,8 @@ interface Monastery {
   lat: number;
   lng: number;
   description?: string;
+  mapillaryImageId?: string; // Mapillary image ID for street view
+  photoSphereUrl?: string; // URL for PhotoSphereViewer 360 interior
 }
 
 interface GoogleMapComponentProps {
@@ -217,6 +223,16 @@ const GoogleMapComponent = ({
   // Cache for Street View availability to prevent repeated API calls and 429 errors
   const streetViewCacheRef = useRef<Map<string, google.maps.StreetViewPanoramaData | null>>(new Map());
   const checkingStreetViewRef = useRef<Set<string>>(new Set()); // Track ongoing checks to prevent duplicates
+  
+  // Viewer states for Mapillary and PhotoSphereViewer
+  const [showMapillary, setShowMapillary] = useState(false);
+  const [showPhotoSphere, setShowPhotoSphere] = useState(false);
+  const [showViewerMenu, setShowViewerMenu] = useState(false);
+  const [currentMonastery, setCurrentMonastery] = useState<Monastery | null>(null);
+  const photoSphereContainerRef = useRef<HTMLDivElement>(null);
+  const mapillaryContainerRef = useRef<HTMLDivElement>(null);
+  const photoSphereViewerRef = useRef<Viewer | null>(null);
+  const mapillaryViewerRef = useRef<MapillaryViewer | null>(null);
 
   // Handle map load - set state and ref, enforce Sikkim bounds
   // This should only run ONCE when the map first loads
@@ -272,13 +288,21 @@ const GoogleMapComponent = ({
       }
     });
     
-    // Configure Street View options
+    // Configure Street View options for better display
     streetView.setOptions({
       visible: false,
       enableCloseButton: true,
       linksControl: true,
       panControl: true,
-      zoomControl: true
+      zoomControl: true,
+      addressControl: true,
+      fullscreenControl: true,
+      motionTracking: false,
+      motionTrackingControl: false,
+      pov: {
+        heading: 0,
+        pitch: 0
+      }
     });
     
     // Fit bounds to show the entire Sikkim region, or use provided zoom
@@ -312,108 +336,327 @@ const GoogleMapComponent = ({
             onMarkerClick(monastery);
           }
           
-          // Check for Street View availability and open if available
-          if (!mapRef.current) return;
-          
-          const streetView = mapRef.current.getStreetView();
-          
-          // Check cache first to avoid repeated API calls
-          const cachedResult = streetViewCacheRef.current.get(cacheKey);
-          
-          if (cachedResult !== undefined) {
-            // Use cached result - add delay to prevent tile loading burst
-            if (cachedResult && cachedResult.location) {
-              setTimeout(() => {
-                if (mapRef.current) {
-                  streetView.setPosition(cachedResult.location.latLng);
-                  // Delay making Street View visible to throttle tile loading
-                  setTimeout(() => {
-                    streetView.setVisible(true);
-                    mapRef.current?.setStreetView(streetView);
-                  }, 300); // 300ms delay to prevent Google from hitting tile burst
-                }
-              }, 100);
-            }
-            return;
-          }
-          
-          // Prevent multiple simultaneous checks for the same location
-          if (checkingStreetViewRef.current.has(cacheKey)) {
-            return;
-          }
-          
-          checkingStreetViewRef.current.add(cacheKey);
-          const panoramaService = new google.maps.StreetViewService();
-          
-          // Check for Street View within 200 meters (increased radius to reduce retries)
-          // Larger radius means fewer retries, which reduces 429 errors
-          panoramaService.getPanorama(
-            { 
-              location: { lat: monastery.lat, lng: monastery.lng }, 
-              radius: 200  // Increased from 50 to 200 to reduce tile retries
-            },
-            (data, status) => {
-              checkingStreetViewRef.current.delete(cacheKey);
-              
-              if (status === 'OK' && data && data.location) {
-                // Street View available - cache and show it with delay to throttle tile loading
-                streetViewCacheRef.current.set(cacheKey, data);
-                setTimeout(() => {
-                  if (mapRef.current) {
-                    streetView.setPosition(data.location.latLng);
-                    // Delay making Street View visible to throttle tile loading
-                    setTimeout(() => {
-                      streetView.setVisible(true);
-                      mapRef.current?.setStreetView(streetView);
-                    }, 300); // 300ms delay to prevent Google from hitting tile burst
-                  }
-                }, 100);
-              } else {
-                // No Street View available - cache null result
-                // Don't check further to avoid 429 errors
-                streetViewCacheRef.current.set(cacheKey, null);
-              }
-            }
-          );
+          // Show viewer selection menu
+          setCurrentMonastery(monastery);
+          setShowViewerMenu(true);
         }
       };
     });
   }, [memoizedMonasteries, onMarkerClick]);
 
+  // Mapillary Access Token (get from https://www.mapillary.com/developer)
+  const MAPILLARY_ACCESS_TOKEN = 'YOUR_MAPILLARY_ACCESS_TOKEN'; // Replace with your token
+
+  // Initialize PhotoSphereViewer for 360 interior views
+  useEffect(() => {
+    if (!showPhotoSphere || !currentMonastery?.photoSphereUrl || !photoSphereContainerRef.current) return;
+
+    const viewer = new Viewer({
+      container: photoSphereContainerRef.current,
+      panorama: currentMonastery.photoSphereUrl,
+      caption: currentMonastery.name,
+      navbar: [
+        'zoom',
+        'move',
+        'caption',
+        'fullscreen',
+        'close'
+      ],
+      defaultZoomLvl: 30,
+      sphereCorrection: { pan: 0, tilt: 0, roll: 0 }
+    });
+
+    photoSphereViewerRef.current = viewer;
+
+    return () => {
+      if (photoSphereViewerRef.current) {
+        photoSphereViewerRef.current.destroy();
+        photoSphereViewerRef.current = null;
+      }
+    };
+  }, [showPhotoSphere, currentMonastery]);
+
+  // Initialize Mapillary SDK for street view
+  useEffect(() => {
+    if (!showMapillary || !mapillaryContainerRef.current || !currentMonastery) return;
+
+    // Check if we have Mapillary image ID for this monastery
+    if (!currentMonastery.mapillaryImageId) {
+      console.warn(`No Mapillary image ID found for ${currentMonastery.name}`);
+      return;
+    }
+
+    // Check if access token is configured
+    if (MAPILLARY_ACCESS_TOKEN === 'YOUR_MAPILLARY_ACCESS_TOKEN') {
+      console.warn('Mapillary access token not configured. Please add your token in google-map.tsx');
+      return;
+    }
+
+    // Create Mapillary viewer
+    const viewer = new MapillaryViewer({
+      container: mapillaryContainerRef.current,
+      accessToken: MAPILLARY_ACCESS_TOKEN,
+      imageId: currentMonastery.mapillaryImageId,
+    });
+
+    mapillaryViewerRef.current = viewer;
+
+    return () => {
+      if (mapillaryViewerRef.current) {
+        mapillaryViewerRef.current.remove();
+        mapillaryViewerRef.current = null;
+      }
+    };
+  }, [showMapillary, currentMonastery]);
+
+  const closeViewers = useCallback(() => {
+    setShowPhotoSphere(false);
+    setShowMapillary(false);
+    setShowViewerMenu(false);
+    setCurrentMonastery(null);
+  }, []);
+
+  const openMapillary = useCallback(() => {
+    setShowViewerMenu(false);
+    setShowMapillary(true);
+  }, []);
+
+  const openPhotoSphere = useCallback(() => {
+    setShowViewerMenu(false);
+    if (currentMonastery?.photoSphereUrl) {
+      setShowPhotoSphere(true);
+    }
+  }, [currentMonastery]);
+
+  const openGoogleStreetView = useCallback(() => {
+    if (!mapRef.current || !currentMonastery) return;
+    
+    setShowViewerMenu(false);
+    
+    const streetView = mapRef.current.getStreetView();
+    const cacheKey = `${currentMonastery.lat}-${currentMonastery.lng}`;
+    
+    // Check cache first to avoid repeated API calls
+    const cachedResult = streetViewCacheRef.current.get(cacheKey);
+    
+    if (cachedResult !== undefined) {
+      // Use cached result - add delay to prevent tile loading burst
+      if (cachedResult && cachedResult.location) {
+        setTimeout(() => {
+          if (mapRef.current) {
+            streetView.setPosition(cachedResult.location.latLng);
+            // Delay making Street View visible to throttle tile loading
+              setTimeout(() => {
+                if (mapRef.current) {
+                  // Ensure Street View is properly configured before showing
+                  streetView.setOptions({
+                    visible: true,
+                    pov: {
+                      heading: 0,
+                      pitch: 0
+                    },
+                    addressControl: true,
+                    fullscreenControl: true,
+                    linksControl: true,
+                    panControl: true,
+                    zoomControl: true
+                  });
+                  mapRef.current.setStreetView(streetView);
+                }
+              }, 300); // 300ms delay to prevent Google from hitting tile burst
+          }
+        }, 100);
+      } else {
+        // No Street View available at this location
+        alert(`Google Street View is not available at ${currentMonastery.name}. Please try another location.`);
+      }
+      return;
+    }
+    
+    // Prevent multiple simultaneous checks for the same location
+    if (checkingStreetViewRef.current.has(cacheKey)) {
+      return;
+    }
+    
+    checkingStreetViewRef.current.add(cacheKey);
+    const panoramaService = new google.maps.StreetViewService();
+    
+    // Check for Street View within 200 meters (increased radius to reduce retries)
+    // Larger radius means fewer retries, which reduces 429 errors
+    panoramaService.getPanorama(
+      { 
+        location: { lat: currentMonastery.lat, lng: currentMonastery.lng }, 
+        radius: 200  // Increased from 50 to 200 to reduce tile retries
+      },
+      (data, status) => {
+        checkingStreetViewRef.current.delete(cacheKey);
+        
+        if (status === 'OK' && data && data.location) {
+          // Street View available - cache and show it with delay to throttle tile loading
+          streetViewCacheRef.current.set(cacheKey, data);
+          setTimeout(() => {
+            if (mapRef.current) {
+              streetView.setPosition(data.location.latLng);
+              // Delay making Street View visible to throttle tile loading
+              setTimeout(() => {
+                if (mapRef.current) {
+                  // Ensure Street View is properly configured before showing
+                  streetView.setOptions({
+                    visible: true,
+                    pov: {
+                      heading: 0,
+                      pitch: 0
+                    },
+                    addressControl: true,
+                    fullscreenControl: true,
+                    linksControl: true,
+                    panControl: true,
+                    zoomControl: true
+                  });
+                  mapRef.current.setStreetView(streetView);
+                }
+              }, 300); // 300ms delay to prevent Google from hitting tile burst
+            }
+          }, 100);
+        } else {
+          // No Street View available - cache null result
+          // Don't check further to avoid 429 errors
+          streetViewCacheRef.current.set(cacheKey, null);
+          alert(`Google Street View is not available at ${currentMonastery.name}. Please try another location.`);
+        }
+      }
+    );
+  }, [currentMonastery]);
+
   return (
-    <GoogleMap
-      mapContainerStyle={MAP_CONTAINER_STYLE}
-      center={mapCenter}
-      zoom={mapZoom}
-      options={mapOptions}
-      onLoad={onLoad}
-      onUnmount={onUnmount}
-    >
-      {/* Sikkim Region Highlight Polygon */}
-      <Polygon
-        paths={SIKKIM_POLYGON_PATH}
-        options={{
-          fillColor: '#FFD700',
-          fillOpacity: 0.15,
-          strokeColor: '#FFD700',
-          strokeOpacity: 0.6,
-          strokeWeight: 3,
-          clickable: false,
-          zIndex: 1  // Lower zIndex so markers appear above
-        }}
-      />
-      
-      {/* Monastery Markers */}
-      {markerData.map((data) => (
-        <AdvancedMarker
-          key={data.id}
-          map={mapInstance}  // Use state instead of ref to trigger re-renders
-          position={data.position}
-          title={data.name}
-          onClick={data.onClick}
+    <div className="relative w-full h-full">
+      {/* Ensure Street View container has proper styling */}
+      <style>{`
+        .gm-style iframe {
+          filter: none !important;
+          -webkit-filter: none !important;
+        }
+        .gm-style > div {
+          filter: none !important;
+          -webkit-filter: none !important;
+        }
+      `}</style>
+      <GoogleMap
+        mapContainerStyle={MAP_CONTAINER_STYLE}
+        center={mapCenter}
+        zoom={mapZoom}
+        options={mapOptions}
+        onLoad={onLoad}
+        onUnmount={onUnmount}
+      >
+        {/* Sikkim Region Highlight Polygon */}
+        <Polygon
+          paths={SIKKIM_POLYGON_PATH}
+          options={{
+            fillColor: '#FFD700',
+            fillOpacity: 0.15,
+            strokeColor: '#FFD700',
+            strokeOpacity: 0.6,
+            strokeWeight: 3,
+            clickable: false,
+            zIndex: 1  // Lower zIndex so markers appear above
+          }}
         />
-      ))}
-    </GoogleMap>
+        
+        {/* Monastery Markers */}
+        {markerData.map((data) => (
+          <AdvancedMarker
+            key={data.id}
+            map={mapInstance}  // Use state instead of ref to trigger re-renders
+            position={data.position}
+            title={data.name}
+            onClick={data.onClick}
+          />
+        ))}
+      </GoogleMap>
+
+      {/* Viewer Selection Menu */}
+      {showViewerMenu && currentMonastery && (
+        <div className="fixed inset-0 z-40 bg-black/50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 shadow-2xl max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">{currentMonastery.name}</h3>
+            <p className="text-sm text-gray-600 mb-6">{currentMonastery.description}</p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={openGoogleStreetView}
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+              >
+                Google Street View
+              </button>
+              {currentMonastery.mapillaryImageId && (
+                <button
+                  onClick={openMapillary}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  Street View (Mapillary)
+                </button>
+              )}
+              {currentMonastery.photoSphereUrl && (
+                <button
+                  onClick={openPhotoSphere}
+                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  360° Interior View
+                </button>
+              )}
+              <button
+                onClick={closeViewers}
+                className="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PhotoSphereViewer Modal for 360 Interiors */}
+      {showPhotoSphere && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+          <div className="relative w-full h-full max-w-7xl max-h-[90vh]">
+            <button
+              onClick={closeViewers}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg"
+              aria-label="Close"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div ref={photoSphereContainerRef} className="w-full h-full rounded-lg" />
+          </div>
+        </div>
+      )}
+
+      {/* Mapillary Modal for Street View */}
+      {showMapillary && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+          <div className="relative w-full h-full max-w-7xl max-h-[90vh]">
+            <button
+              onClick={closeViewers}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg"
+              aria-label="Close"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div ref={mapillaryContainerRef} className="w-full h-full rounded-lg" />
+            {currentMonastery && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 px-4 py-2 rounded-lg shadow-lg">
+                <p className="text-sm font-semibold">{currentMonastery.name}</p>
+                <p className="text-xs text-gray-600">Street View via Mapillary</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
