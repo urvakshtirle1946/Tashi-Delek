@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import * as THREE from 'three';
 import VoiceGuide, { ModelInfo } from '@/components/VoiceGuide';
+import Hotspot from '@/components/3d/Hotspot';
 
 // Phodong Monastery Information for Voice Guide
 const phodongInfo: ModelInfo = {
@@ -52,11 +53,62 @@ interface ModelProps {
   modelRef: React.RefObject<THREE.Group>;
 }
 
-function PhodongModel({ isRotating, modelRef }: ModelProps) {
+// Hotspot data for Phodong Monastery
+const phodongHotspots = [
+  {
+    position: [0, 1.5, 2.5] as [number, number, number], // Front - reduced height
+    lineTarget: [0, 1.5, 0.8] as [number, number, number],
+    title: "Main Gateway",
+    description: "Ornate entrance with traditional Buddhist iconography",
+    color: "#D3AF37"
+  },
+  {
+    position: [-2.5, 1.3, 1] as [number, number, number], // Left front - reduced
+    lineTarget: [-1.1, 1, 0.4] as [number, number, number],
+    title: "Assembly Hall",
+    description: "Large hall where monks gather for prayers and teachings",
+    color: "#FF6B6B"
+  },
+  {
+    position: [2.5, 0.8, -1.5] as [number, number, number], // Right back - reduced
+    lineTarget: [1, 0.6, -0.5] as [number, number, number],
+    title: "Butter Lamp Chamber",
+    description: "Sacred room filled with thousands of butter lamps",
+    color: "#FFD700"
+  },
+  {
+    position: [0, -0.7, -2.8] as [number, number, number], // Bottom back
+    lineTarget: [0, 0.1, -1.2] as [number, number, number],
+    title: "Bell & Drum Tower",
+    description: "Traditional instruments for calling monks to prayer",
+    color: "#4ECDC4"
+  },
+  {
+    position: [2.2, 1.5, 1.2] as [number, number, number], // Right front - reduced
+    lineTarget: [0.9, 1.7, 0.6] as [number, number, number],
+    title: "Rooftop Shrine",
+    description: "Sacred space with panoramic mountain views",
+    color: "#95E1D3"
+  }
+];
+
+interface ModelProps {
+  isRotating: boolean;
+  modelRef: React.RefObject<THREE.Group>;
+  onHotspotHover: (hovered: boolean) => void;
+}
+
+function PhodongModel({ isRotating, modelRef, onHotspotHover }: ModelProps) {
   const { scene } = useGLTF('/assets/Models/phodong.glb');
+  const isHoveredRef = useRef(false);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    isHoveredRef.current = hovered;
+    onHotspotHover(hovered);
+  };
 
   useFrame((state, delta) => {
-    if (modelRef.current && isRotating) {
+    if (modelRef.current && isRotating && !isHoveredRef.current) {
       modelRef.current.rotation.y += delta * 0.15;
     }
   });
@@ -66,6 +118,19 @@ function PhodongModel({ isRotating, modelRef }: ModelProps) {
   return (
     <group ref={modelRef}>
       <primitive object={clonedScene} scale={2.5} position={[0, 0, 0]} />
+      
+      {/* Hotspots */}
+      {phodongHotspots.map((hotspot, index) => (
+        <Hotspot
+          key={index}
+          position={hotspot.position}
+          lineTarget={hotspot.lineTarget}
+          title={hotspot.title}
+          description={hotspot.description}
+          color={hotspot.color}
+          onHover={handleHotspotHover}
+        />
+      ))}
     </group>
   );
 }
@@ -73,8 +138,13 @@ function PhodongModel({ isRotating, modelRef }: ModelProps) {
 const PhodongTour = () => {
   const navigate = useNavigate();
   const [isRotating, setIsRotating] = useState(true);
+  const [isHotspotHovered, setIsHotspotHovered] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 0, 10]);
   const modelRef = useRef<THREE.Group>(null);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    setIsHotspotHovered(hovered);
+  };
 
   const resetCamera = () => {
     setCameraPosition([0, 0, 10]);
@@ -157,7 +227,11 @@ const PhodongTour = () => {
           />
 
           {/* 3D Model */}
-          <PhodongModel isRotating={isRotating} modelRef={modelRef} />
+          <PhodongModel 
+            isRotating={isRotating && !isHotspotHovered} 
+            modelRef={modelRef}
+            onHotspotHover={handleHotspotHover}
+          />
 
           {/* Orbit Controls */}
           <OrbitControls

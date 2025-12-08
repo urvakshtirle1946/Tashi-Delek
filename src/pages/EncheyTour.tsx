@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import * as THREE from 'three';
 import VoiceGuide, { ModelInfo } from '@/components/VoiceGuide';
+import Hotspot from '@/components/3d/Hotspot';
 
 // Enchey Monastery Information for Voice Guide
 const encheyInfo: ModelInfo = {
@@ -52,11 +53,62 @@ interface ModelProps {
   modelRef: React.RefObject<THREE.Group>;
 }
 
-function EncheyModel({ isRotating, modelRef }: ModelProps) {
+// Hotspot data for Enchey Monastery
+const encheyHotspots = [
+  {
+    position: [0, 1.5, 2.2] as [number, number, number], // Front - reduced height
+    lineTarget: [0, 1.2, 0.6] as [number, number, number],
+    title: "Main Shrine",
+    description: "Beautiful prayer hall blessed by Tantric master Druptob Karpo",
+    color: "#D3AF37"
+  },
+  {
+    position: [-2.5, 0.8, 1] as [number, number, number], // Left front - reduced
+    lineTarget: [-0.9, 0.6, 0.4] as [number, number, number],
+    title: "Prayer Wheel Gallery",
+    description: "Row of traditional prayer wheels inscribed with sacred mantras",
+    color: "#FF6B6B"
+  },
+  {
+    position: [2.5, 1.3, 0] as [number, number, number], // Right side - reduced
+    lineTarget: [1, 1.2, 0] as [number, number, number],
+    title: "Observation Deck",
+    description: "Panoramic views of Gangtok city and Kanchenjunga range",
+    color: "#4ECDC4"
+  },
+  {
+    position: [0, -0.7, -2.5] as [number, number, number], // Bottom back
+    lineTarget: [0, 0, -0.9] as [number, number, number],
+    title: "Sacred Garden",
+    description: "Peaceful meditation garden with ancient pine trees",
+    color: "#95E1D3"
+  },
+  {
+    position: [-2, -0.5, 2] as [number, number, number], // Bottom left front
+    lineTarget: [-0.7, 0.1, 0.8] as [number, number, number],
+    title: "Entrance Plaza",
+    description: "Welcome courtyard with traditional architecture",
+    color: "#FFD700"
+  }
+];
+
+interface ModelProps {
+  isRotating: boolean;
+  modelRef: React.RefObject<THREE.Group>;
+  onHotspotHover: (hovered: boolean) => void;
+}
+
+function EncheyModel({ isRotating, modelRef, onHotspotHover }: ModelProps) {
   const { scene } = useGLTF('/assets/Models/encheymonasterymodel.glb');
+  const isHoveredRef = useRef(false);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    isHoveredRef.current = hovered;
+    onHotspotHover(hovered);
+  };
 
   useFrame((state, delta) => {
-    if (modelRef.current && isRotating) {
+    if (modelRef.current && isRotating && !isHoveredRef.current) {
       modelRef.current.rotation.y += delta * 0.15;
     }
   });
@@ -66,6 +118,19 @@ function EncheyModel({ isRotating, modelRef }: ModelProps) {
   return (
     <group ref={modelRef}>
       <primitive object={clonedScene} scale={2.5} position={[0, 0, 0]} />
+      
+      {/* Hotspots */}
+      {encheyHotspots.map((hotspot, index) => (
+        <Hotspot
+          key={index}
+          position={hotspot.position}
+          lineTarget={hotspot.lineTarget}
+          title={hotspot.title}
+          description={hotspot.description}
+          color={hotspot.color}
+          onHover={handleHotspotHover}
+        />
+      ))}
     </group>
   );
 }
@@ -73,8 +138,13 @@ function EncheyModel({ isRotating, modelRef }: ModelProps) {
 const EncheyTour = () => {
   const navigate = useNavigate();
   const [isRotating, setIsRotating] = useState(true);
+  const [isHotspotHovered, setIsHotspotHovered] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 0, 10]);
   const modelRef = useRef<THREE.Group>(null);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    setIsHotspotHovered(hovered);
+  };
 
   const resetCamera = () => {
     setCameraPosition([0, 0, 10]);
@@ -157,7 +227,11 @@ const EncheyTour = () => {
           />
 
           {/* 3D Model */}
-          <EncheyModel isRotating={isRotating} modelRef={modelRef} />
+          <EncheyModel 
+            isRotating={isRotating && !isHotspotHovered} 
+            modelRef={modelRef}
+            onHotspotHover={handleHotspotHover}
+          />
 
           {/* Orbit Controls */}
           <OrbitControls

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import * as THREE from 'three';
 import VoiceGuide, { ModelInfo } from '@/components/VoiceGuide';
+import Hotspot from '@/components/3d/Hotspot';
 
 // Ravangla Monastery Information for Voice Guide
 const ravanglaInfo: ModelInfo = {
@@ -52,11 +53,69 @@ interface ModelProps {
   modelRef: React.RefObject<THREE.Group>;
 }
 
-function RavanglaModel({ isRotating, modelRef }: ModelProps) {
+// Hotspot data for Ravangla Buddha Park
+const ravanglaHotspots = [
+  {
+    position: [0, 2.5, 2.5] as [number, number, number], // Front (Buddha head) - reduced height
+    lineTarget: [0, 2.3, 0.5] as [number, number, number],
+    title: "Buddha Statue",
+    description: "Magnificent 130-ft statue of Shakyamuni Buddha, one of the tallest in India",
+    color: "#FFD700"
+  },
+  {
+    position: [-2.8, 0.8, 1.5] as [number, number, number], // Left front - reduced
+    lineTarget: [-1.2, 0.8, 0.6] as [number, number, number],
+    title: "Prayer Flags",
+    description: "Colorful prayer flags carrying blessings in the Himalayan breeze",
+    color: "#FF6B6B"
+  },
+  {
+    position: [2.8, 1.3, 0] as [number, number, number], // Right side - reduced
+    lineTarget: [1.2, 1.2, 0] as [number, number, number],
+    title: "Meditation Pavilion",
+    description: "Serene spot with panoramic views of Kanchenjunga",
+    color: "#4ECDC4"
+  },
+  {
+    position: [-1.2, -0.7, -2.8] as [number, number, number], // Bottom back left
+    lineTarget: [-0.4, 0, -1.1] as [number, number, number],
+    title: "Sacred Garden",
+    description: "Landscaped gardens representing Buddhist cosmology",
+    color: "#D3AF37"
+  },
+  {
+    position: [2.2, 1.5, 1] as [number, number, number], // Right front - reduced
+    lineTarget: [0.9, 1.8, 0.4] as [number, number, number],
+    title: "Replica Monasteries",
+    description: "Miniature replicas of major Sikkim monasteries",
+    color: "#95E1D3"
+  },
+  {
+    position: [1.5, -0.5, 2.5] as [number, number, number], // Bottom front right
+    lineTarget: [0.5, 0, 1] as [number, number, number],
+    title: "Lotus Pond",
+    description: "Sacred water feature symbolizing purity and enlightenment",
+    color: "#66D9EF"
+  }
+];
+
+interface ModelProps {
+  isRotating: boolean;
+  modelRef: React.RefObject<THREE.Group>;
+  onHotspotHover: (hovered: boolean) => void;
+}
+
+function RavanglaModel({ isRotating, modelRef, onHotspotHover }: ModelProps) {
   const { scene } = useGLTF('/assets/Models/ravangla.glb');
+  const isHoveredRef = useRef(false);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    isHoveredRef.current = hovered;
+    onHotspotHover(hovered);
+  };
 
   useFrame((state, delta) => {
-    if (modelRef.current && isRotating) {
+    if (modelRef.current && isRotating && !isHoveredRef.current) {
       modelRef.current.rotation.y += delta * 0.15;
     }
   });
@@ -66,6 +125,19 @@ function RavanglaModel({ isRotating, modelRef }: ModelProps) {
   return (
     <group ref={modelRef}>
       <primitive object={clonedScene} scale={2.5} position={[0, 0, 0]} />
+      
+      {/* Hotspots */}
+      {ravanglaHotspots.map((hotspot, index) => (
+        <Hotspot
+          key={index}
+          position={hotspot.position}
+          lineTarget={hotspot.lineTarget}
+          title={hotspot.title}
+          description={hotspot.description}
+          color={hotspot.color}
+          onHover={handleHotspotHover}
+        />
+      ))}
     </group>
   );
 }
@@ -73,8 +145,13 @@ function RavanglaModel({ isRotating, modelRef }: ModelProps) {
 const RavanglaTour = () => {
   const navigate = useNavigate();
   const [isRotating, setIsRotating] = useState(true);
+  const [isHotspotHovered, setIsHotspotHovered] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 0, 10]);
   const modelRef = useRef<THREE.Group>(null);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    setIsHotspotHovered(hovered);
+  };
 
   const resetCamera = () => {
     setCameraPosition([0, 0, 10]);
@@ -157,7 +234,11 @@ const RavanglaTour = () => {
           />
 
           {/* 3D Model */}
-          <RavanglaModel isRotating={isRotating} modelRef={modelRef} />
+          <RavanglaModel 
+            isRotating={isRotating && !isHotspotHovered} 
+            modelRef={modelRef}
+            onHotspotHover={handleHotspotHover}
+          />
 
           {/* Orbit Controls */}
           <OrbitControls
