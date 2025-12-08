@@ -6,7 +6,7 @@ import { Heart, ArrowLeft, Upload, Camera, BookOpen, Share2, MessageCircle } fro
 import MuteButton from "@/components/MuteButton";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
 import type { CardData } from "@/components/ui/stacked-cards-interaction";
-import { Lens } from "@/components/ui/lens";
+import { ImageGallery } from "@/components/ui/image-gallery";
 
 const CommunityPage = () => {
   const [selectedTab, setSelectedTab] = useState<string>("photos");
@@ -46,6 +46,138 @@ const CommunityPage = () => {
       likes: 67,
       comments: 9,
       description: "Ancient prayer wheels spinning in the mountain breeze",
+      image: "https://images.unsplash.com/photo-1591825729269-caeb344f6df2?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 8,
+      type: "photo",
+      title: "Monastery Courtyard at Dawn",
+      contributor: "Tenzin Dorjee",
+      location: "Rumtek Monastery",
+      date: "4 days ago",
+      likes: 52,
+      comments: 8,
+      description: "Peaceful morning atmosphere in the monastery courtyard",
+      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 9,
+      type: "photo",
+      title: "Buddhist Stupa in Golden Light",
+      contributor: "Pema Choden",
+      location: "Enchey Monastery",
+      date: "5 days ago",
+      likes: 73,
+      comments: 11,
+      description: "Sacred stupa glowing in the evening sunlight",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 10,
+      type: "photo",
+      title: "Monks in Meditation",
+      contributor: "Karma Wangyal",
+      location: "Pemayangtse Monastery",
+      date: "6 days ago",
+      likes: 94,
+      comments: 19,
+      description: "Serene moment of monks in deep meditation",
+      image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 11,
+      type: "photo",
+      title: "Traditional Architecture Details",
+      contributor: "Sonam Gyatso",
+      location: "Rumtek Monastery",
+      date: "1 week ago",
+      likes: 61,
+      comments: 7,
+      description: "Intricate carvings and traditional Tibetan architecture",
+      image: "https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 12,
+      type: "photo",
+      title: "Mountain View from Monastery",
+      contributor: "Lhakpa Tsering",
+      location: "Enchey Monastery",
+      date: "1 week ago",
+      likes: 88,
+      comments: 14,
+      description: "Breathtaking view of the Himalayas from the monastery",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 13,
+      type: "photo",
+      title: "Butter Lamps Illumination",
+      contributor: "Dorji Lhamo",
+      location: "Pemayangtse Monastery",
+      date: "2 weeks ago",
+      likes: 105,
+      comments: 22,
+      description: "Hundreds of butter lamps creating a spiritual ambiance",
+      image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 14,
+      type: "photo",
+      title: "Prayer Flags in Wind",
+      contributor: "Tashi Dolma",
+      location: "Rumtek Monastery",
+      date: "2 weeks ago",
+      likes: 79,
+      comments: 16,
+      description: "Colorful prayer flags dancing in the mountain wind",
+      image: "https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 15,
+      type: "photo",
+      title: "Monastery Entrance Gate",
+      contributor: "Karma Sangmo",
+      location: "Enchey Monastery",
+      date: "2 weeks ago",
+      likes: 56,
+      comments: 9,
+      description: "Ornate entrance gate welcoming visitors",
+      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 16,
+      type: "photo",
+      title: "Thangka Paintings Collection",
+      contributor: "Pema Yangchen",
+      location: "Pemayangtse Monastery",
+      date: "3 weeks ago",
+      likes: 112,
+      comments: 28,
+      description: "Rare collection of traditional thangka paintings",
+      image: "https://images.unsplash.com/photo-1528741254566-d718e868201f?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 17,
+      type: "photo",
+      title: "Monastery Bell Tower",
+      contributor: "Sonam Tashi",
+      location: "Rumtek Monastery",
+      date: "3 weeks ago",
+      likes: 68,
+      comments: 12,
+      description: "Historic bell tower with traditional design",
+      image: "https://images.unsplash.com/photo-1604823732630-491316b5cf83?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      id: 18,
+      type: "photo",
+      title: "Evening Prayer Session",
+      contributor: "Lhakpa Dolma",
+      location: "Enchey Monastery",
+      date: "3 weeks ago",
+      likes: 91,
+      comments: 18,
+      description: "Monks gathered for evening prayers",
       image: "https://images.unsplash.com/photo-1591825729269-caeb344f6df2?q=80&w=800&auto=format&fit=crop"
     },
     {
@@ -180,35 +312,36 @@ const CommunityPage = () => {
                   Hover over the cards to explore different monastery stories passed down through generations
                 </p>
               </div>
+            ) : selectedTab === "photos" ? (
+              // Image Gallery for Photos
+              <div className="mb-16">
+                <ImageGallery 
+                  images={contributions
+                    .filter(c => c.type === "photo")
+                    .map(photo => ({
+                      id: photo.id,
+                      src: photo.image || "",
+                      alt: photo.title,
+                      ratio: Math.random() > 0.5 ? 9 / 16 : 16 / 9
+                    }))}
+                />
+              </div>
             ) : (
-              // Regular Grid for Photos and Manuscripts
+              // Regular Grid for Manuscripts
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {contributions
-                  .filter(c => selectedTab === "photos" ? c.type === "photo" : 
-                             selectedTab === "manuscripts" ? c.type === "manuscript" : true)
+                  .filter(c => c.type === "manuscript")
                   .map((contribution) => (
                   <Card key={contribution.id} className="group hover:shadow-monastery transition-[var(--transition-monastery)] border-0 bg-card/80 backdrop-blur-sm overflow-hidden">
                     {contribution.image && (
                       <CardHeader className="p-0">
-                        {selectedTab === "photos" ? (
-                          <Lens zoomFactor={2} lensSize={150}>
-                            <div className="relative h-48 overflow-hidden">
-                              <img 
-                                src={contribution.image} 
-                                alt={contribution.title}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </Lens>
-                        ) : (
-                          <div className="relative h-48 overflow-hidden">
-                            <img 
-                              src={contribution.image} 
-                              alt={contribution.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                          </div>
-                        )}
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src={contribution.image} 
+                            alt={contribution.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
                       </CardHeader>
                     )}
                     

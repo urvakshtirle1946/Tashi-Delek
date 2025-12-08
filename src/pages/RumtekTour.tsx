@@ -1,5 +1,5 @@
-import React, { Suspense, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import React, { Suspense, useRef, useState, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, Html, PerspectiveCamera, ContactShadows } from '@react-three/drei';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,11 +10,18 @@ import {
   ZoomOut,
   Pause,
   Play,
-  Home
+  Home,
+  ArrowRight,
+  X,
+  Volume2,
+  VolumeX,
+  PauseCircle,
+  PlayCircle
 } from 'lucide-react';
 import * as THREE from 'three';
 import VoiceGuide, { ModelInfo } from '@/components/VoiceGuide';
 import Hotspot from '@/components/3d/Hotspot';
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 
 // Rumtek Monastery Information for Voice Guide
 const rumtekInfo: ModelInfo = {
@@ -51,46 +58,46 @@ const rumtekInfo: ModelInfo = {
 // Hotspot data for Rumtek Monastery
 const rumtekHotspots = [
   {
+    position: [2.5, 1.5, 0.5] as [number, number, number], // Right side - reduced
+    lineTarget: [1, 1.2, 0.2] as [number, number, number],
+    title: "Main prayer hall",
+    description: "On the ground floor of the main monastery, there is a large prayer hall decorated with murals, thankas, silk paintings and statues. The interiors and exteriors of are richly decorated with intricate woodwork, carved pillars, painted murals, and traditional motifs",
+    color: "#EE4B2B"
+  },
+  {
     position: [0, 1.8, 2.5] as [number, number, number], // Front - reduced height
     lineTarget: [0, 1.2, 0.8] as [number, number, number],
-    title: "Main Temple Entrance",
-    description: "The grand entrance adorned with traditional Tibetan Buddhist motifs and prayer wheels",
-    color: "#D3AF37"
+    title: "Main gate",
+    description: "The entrance to Rumtek is designed following traditional Tibetan-monastic aesthetics, marking a formal threshold between the secular world outside and the sacred monastic precincts",
+    color: "#EE4B2B"
+  },
+  {
+    position: [-2.2, 1.8, 1.2] as [number, number, number], // Left front - reduced
+    lineTarget: [-0.8, 1.4, 0.5] as [number, number, number],
+    title: "Location",
+    description: "Located about 24 km from Gangtok at an altitude around 1,500 m, the monastery overlooks lush hills, valleys and misty mountains",
+    color: "#EE4B2B"
   },
   {
     position: [-2.5, 1.2, 0] as [number, number, number], // Left side - reduced
     lineTarget: [-1, 0.9, 0] as [number, number, number],
     title: "Golden Stupa",
-    description: "Sacred stupa containing relics of the 16th Karmapa, covered in gold leaf",
-    color: "#FFD700"
-  },
-  {
-    position: [2.5, 1.5, 0.5] as [number, number, number], // Right side - reduced
-    lineTarget: [1, 1.2, 0.2] as [number, number, number],
-    title: "Prayer Hall",
-    description: "Main shrine with 4-story high statue of Buddha Shakyamuni",
-    color: "#FF6B6B"
+    description: "A sacred stupa housing the relics of the 16th Karmapa. Decorated with gold and jewels, it represents Tibetan craftsmanship and spiritual symbolism",
+    color: "#EE4B2B"
   },
   {
     position: [0.5, -0.7, -2.5] as [number, number, number], // Bottom back
     lineTarget: [0.2, 0.1, -1] as [number, number, number],
-    title: "Monks' Quarters",
-    description: "Residential area where over 300 monks live and study Buddhist philosophy",
-    color: "#4ECDC4"
-  },
-  {
-    position: [-2.2, 1.8, 1.2] as [number, number, number], // Left front - reduced
-    lineTarget: [-0.8, 1.4, 0.5] as [number, number, number],
-    title: "Bell Tower",
-    description: "Traditional bell used for calling monks to prayer sessions",
-    color: "#95E1D3"
+    title: "Monks quarter",
+    description: "The monks' quarters house the resident monks who live, study, and meditate at the monastery. Built in a simple traditional Tibetan style, they reflect the discipline and modes lifestyle of monastic life",
+    color: "#EE4B2B"
   },
   {
     position: [2, -0.5, -2] as [number, number, number], // Bottom right back
     lineTarget: [0.8, 0.2, -0.8] as [number, number, number],
-    title: "Meditation Hall",
-    description: "Quiet space for monks' daily meditation practice",
-    color: "#FF9999"
+    title: "Exterior",
+    description: "The exterior areas of the monastery include the courtyard, walkways, and select terrace spaces. The architecture reflects traditional Tibetan design, with clean lines and open gathering spaces. In clear weather, these areas offer wide views of the surrounding hills and valleys",
+    color: "#EE4B2B"
   }
 ];
 
@@ -98,9 +105,37 @@ interface ModelProps {
   isRotating: boolean;
   modelRef: React.RefObject<THREE.Group>;
   onHotspotHover: (hovered: boolean) => void;
+  currentHotspotIndex?: number;
+  isGuidedTour?: boolean;
 }
 
-function RumtekModel({ isRotating, modelRef, onHotspotHover }: ModelProps) {
+// Camera Controller for smooth transitions
+function CameraController({ 
+  targetPosition, 
+  targetLookAt,
+  enabled 
+}: { 
+  targetPosition: [number, number, number] | null;
+  targetLookAt: [number, number, number] | null;
+  enabled: boolean;
+}) {
+  const { camera } = useThree();
+
+  useFrame(() => {
+    if (!enabled || !targetPosition || !targetLookAt) return;
+    
+    // Smoothly interpolate camera position
+    camera.position.lerp(new THREE.Vector3(...targetPosition), 0.05);
+    
+    // Make camera look at target
+    const lookAtVector = new THREE.Vector3(...targetLookAt);
+    camera.lookAt(lookAtVector);
+  });
+
+  return null;
+}
+
+function RumtekModel({ isRotating, modelRef, onHotspotHover, currentHotspotIndex, isGuidedTour }: ModelProps) {
   const { scene } = useGLTF('/assets/Models/Rumtek.glb');
   const isHoveredRef = useRef(false);
 
@@ -131,6 +166,7 @@ function RumtekModel({ isRotating, modelRef, onHotspotHover }: ModelProps) {
           description={hotspot.description}
           color={hotspot.color}
           onHover={handleHotspotHover}
+          isHighlighted={isGuidedTour && currentHotspotIndex === index}
         />
       ))}
     </group>
@@ -143,6 +179,19 @@ const RumtekTour = () => {
   const [isHotspotHovered, setIsHotspotHovered] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 0, 10]);
   const modelRef = useRef<THREE.Group>(null);
+  
+  // Guided tour state
+  const [isGuidedTour, setIsGuidedTour] = useState(false);
+  const [showIntroDialog, setShowIntroDialog] = useState(true);
+  const [showModel, setShowModel] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0); // 0 = intro, 1-N = hotspots
+  const [showHotspotDialog, setShowHotspotDialog] = useState(false);
+  const [targetCameraPosition, setTargetCameraPosition] = useState<[number, number, number] | null>(null);
+  const [targetLookAt, setTargetLookAt] = useState<[number, number, number] | null>(null);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  
+  // Speech Synthesis hook
+  const { speak, stop, pause, resume, isSpeaking, isPaused } = useSpeechSynthesis();
 
   const handleHotspotHover = (hovered: boolean) => {
     setIsHotspotHovered(hovered);
@@ -162,6 +211,121 @@ const RumtekTour = () => {
   const zoomOut = () => {
     setCameraPosition(prev => [prev[0], prev[1], Math.min(prev[2] + 2, 20)]);
   };
+
+  // Guided tour functions
+  const handleStartTour = () => {
+    stop(); // Stop any ongoing speech
+    setShowIntroDialog(false);
+    setIsGuidedTour(true);
+    setShowModel(true);
+    setCurrentStep(1);
+    // Show first hotspot dialog after a short delay
+    setTimeout(() => {
+      setShowHotspotDialog(true);
+      focusOnHotspot(0);
+    }, 500);
+  };
+
+  const focusOnHotspot = (index: number) => {
+    if (index >= 0 && index < rumtekHotspots.length) {
+      const hotspot = rumtekHotspots[index];
+      const [x, y, z] = hotspot.position;
+      
+      // Calculate camera position to look at the hotspot
+      // Position camera slightly away from hotspot for better view
+      const distance = 7;
+      const angle = Math.PI / 4; // 45 degrees
+      const cameraX = x + distance * Math.cos(angle);
+      const cameraY = y + 2; // Slightly above
+      const cameraZ = z + distance * Math.sin(angle);
+      
+      // Set target positions for smooth interpolation
+      setTargetCameraPosition([cameraX, cameraY, cameraZ]);
+      setTargetLookAt([x, y, z]);
+    }
+  };
+
+  const handleNextHotspot = () => {
+    if (currentStep < rumtekHotspots.length) {
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      
+      if (nextStep <= rumtekHotspots.length) {
+        focusOnHotspot(nextStep - 1);
+        setShowHotspotDialog(true);
+      } else {
+        // Tour complete
+        handleEndTour();
+      }
+    }
+  };
+
+  const handlePreviousHotspot = () => {
+    if (currentStep > 1) {
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      focusOnHotspot(prevStep - 1);
+      setShowHotspotDialog(true);
+    }
+  };
+
+  const handleEndTour = () => {
+    stop(); // Stop any ongoing speech
+    setShowHotspotDialog(false);
+    setIsGuidedTour(false);
+    setCurrentStep(0);
+    resetCamera();
+  };
+
+  const handleSkipTour = () => {
+    stop(); // Stop any ongoing speech
+    setShowIntroDialog(false);
+    setShowModel(true);
+    setIsGuidedTour(false);
+  };
+
+  // Speak intro text when dialog opens
+  useEffect(() => {
+    if (showIntroDialog && isVoiceEnabled) {
+      const introText = `Welcome to ${rumtekInfo.name}. ${rumtekInfo.description}. Located at ${rumtekInfo.location}. Established in ${rumtekInfo.established}.`;
+      speak(introText);
+    }
+    return () => {
+      if (showIntroDialog) {
+        stop();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showIntroDialog]);
+
+  // Effect to update camera when guided tour step changes
+  useEffect(() => {
+    if (isGuidedTour && currentStep > 0 && currentStep <= rumtekHotspots.length) {
+      focusOnHotspot(currentStep - 1);
+    }
+  }, [currentStep, isGuidedTour]);
+
+  // Speak hotspot description when dialog appears
+  useEffect(() => {
+    if (showHotspotDialog && isGuidedTour && isVoiceEnabled && currentStep > 0 && currentStep <= rumtekHotspots.length) {
+      const hotspot = rumtekHotspots[currentStep - 1];
+      speak(`${hotspot.title}. ${hotspot.description}`);
+    }
+    return () => {
+      if (showHotspotDialog) {
+        stop();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showHotspotDialog, currentStep, isGuidedTour]);
+
+  // Cleanup: Stop speech when component unmounts (navigating away)
+  useEffect(() => {
+    return () => {
+      stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -229,22 +393,35 @@ const RumtekTour = () => {
           />
 
           {/* 3D Model */}
-          <RumtekModel 
-            isRotating={isRotating && !isHotspotHovered} 
-            modelRef={modelRef}
-            onHotspotHover={handleHotspotHover}
-          />
+          {showModel && (
+            <RumtekModel 
+              isRotating={isRotating && !isHotspotHovered && !isGuidedTour} 
+              modelRef={modelRef}
+              onHotspotHover={handleHotspotHover}
+              currentHotspotIndex={isGuidedTour ? currentStep - 1 : undefined}
+              isGuidedTour={isGuidedTour}
+            />
+          )}
+
+          {/* Camera Controller for Guided Tour */}
+          {isGuidedTour && targetCameraPosition && targetLookAt && (
+            <CameraController
+              targetPosition={targetCameraPosition}
+              targetLookAt={targetLookAt}
+              enabled={isGuidedTour}
+            />
+          )}
 
           {/* Orbit Controls */}
           <OrbitControls
-            enablePan={false}
-            enableZoom={true}
-            enableRotate={true}
+            enablePan={!isGuidedTour}
+            enableZoom={!isGuidedTour}
+            enableRotate={!isGuidedTour}
             minDistance={4}
             maxDistance={20}
-            autoRotate={isRotating}
+            autoRotate={isRotating && !isGuidedTour}
             autoRotateSpeed={1}
-            target={[0, 0, 0]}
+            target={targetLookAt || [0, 0, 0]}
             maxPolarAngle={Math.PI / 2}
             minPolarAngle={Math.PI / 4}
           />
@@ -324,7 +501,202 @@ const RumtekTour = () => {
       </div>
 
       {/* Voice Guide Chatbot */}
-      <VoiceGuide modelInfo={rumtekInfo} />
+      {!isGuidedTour && <VoiceGuide modelInfo={rumtekInfo} />}
+
+      {/* Intro Dialog - Centered at start */}
+      {showIntroDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Subtle overlay */}
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={handleSkipTour} />
+          {/* Dialog card */}
+          <div className="relative bg-[#650304]/95 backdrop-blur-md border-2 border-[#D3AF37] text-[#D3AF37] rounded-lg p-6 shadow-2xl max-w-md w-full">
+            <div className="absolute top-4 right-4 flex gap-2">
+              {/* Pause/Play Button */}
+              {isVoiceEnabled && (isSpeaking || isPaused) && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (isPaused) {
+                      resume();
+                    } else if (isSpeaking) {
+                      pause();
+                    }
+                  }}
+                  className="text-[#D3AF37] hover:bg-[#D3AF37]/10 z-10"
+                  style={{ position: 'relative' }}
+                >
+                  {isPaused ? (
+                    <PlayCircle className="w-4 h-4" />
+                  ) : (
+                    <PauseCircle className="w-4 h-4" />
+                  )}
+                </Button>
+              )}
+              {/* Mute/Unmute Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  const newVoiceEnabled = !isVoiceEnabled;
+                  setIsVoiceEnabled(newVoiceEnabled);
+                  if (!newVoiceEnabled) {
+                    stop();
+                  } else {
+                    const introText = `Welcome to ${rumtekInfo.name}. ${rumtekInfo.description}. Located at ${rumtekInfo.location}. Established in ${rumtekInfo.established}.`;
+                    speak(introText);
+                  }
+                }}
+                className="text-[#D3AF37] hover:bg-[#D3AF37]/10"
+              >
+                {isVoiceEnabled ? (
+                  <Volume2 className="w-4 h-4" />
+                ) : (
+                  <VolumeX className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+            <div className="mb-3">
+              <h2 className="text-xl font-bold mb-2 text-[#D3AF37]">Welcome to Rumtek Monastery</h2>
+              <p className="text-[#D3AF37]/90 text-sm leading-relaxed line-clamp-3">
+                {rumtekInfo.description}
+              </p>
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="text-xs text-[#D3AF37]/80">
+                <p className="text-[#D3AF37]/80"><strong className="text-[#D3AF37]">Location:</strong> {rumtekInfo.location}</p>
+                <p className="text-[#D3AF37]/80"><strong className="text-[#D3AF37]">Established:</strong> {rumtekInfo.established}</p>
+              </div>
+              <div className="flex gap-2 pt-3">
+                <Button
+                  onClick={handleStartTour}
+                  className="flex-1 bg-[#D3AF37] text-[#650304] hover:bg-[#E5C047] font-semibold text-sm"
+                >
+                  Start Tour
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+                <Button
+                  onClick={handleSkipTour}
+                  variant="outline"
+                  size="sm"
+                  className="border-[#D3AF37] text-[#D3AF37] hover:bg-[#D3AF37]/10"
+                >
+                  Skip
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hotspot Dialog - Positioned at bottom right */}
+      {showHotspotDialog && isGuidedTour && (
+        <div className="fixed bottom-8 right-8 z-50 max-w-sm">
+          <div className="bg-[#650304]/95 backdrop-blur-md border-2 border-[#D3AF37] text-[#D3AF37] rounded-lg p-4 shadow-2xl">
+            <div className="absolute top-2 right-2 flex gap-1">
+              {/* Pause/Play Button */}
+              {isVoiceEnabled && (isSpeaking || isPaused) && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (isPaused) {
+                      resume();
+                    } else if (isSpeaking) {
+                      pause();
+                    }
+                  }}
+                  className="text-[#D3AF37] hover:bg-[#D3AF37]/10 h-6 w-6 z-10"
+                  style={{ position: 'relative' }}
+                >
+                  {isPaused ? (
+                    <PlayCircle className="w-3 h-3" />
+                  ) : (
+                    <PauseCircle className="w-3 h-3" />
+                  )}
+                </Button>
+              )}
+              {/* Mute/Unmute Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  const newVoiceEnabled = !isVoiceEnabled;
+                  setIsVoiceEnabled(newVoiceEnabled);
+                  if (!newVoiceEnabled) {
+                    stop();
+                  } else if (currentStep > 0 && currentStep <= rumtekHotspots.length) {
+                    const hotspot = rumtekHotspots[currentStep - 1];
+                    speak(`${hotspot.title}. ${hotspot.description}`);
+                  }
+                }}
+                className="text-[#D3AF37] hover:bg-[#D3AF37]/10 h-6 w-6"
+              >
+                {isVoiceEnabled ? (
+                  <Volume2 className="w-3 h-3" />
+                ) : (
+                  <VolumeX className="w-3 h-3" />
+                )}
+              </Button>
+            </div>
+            <div className="mb-3">
+              <h2 className="text-lg font-bold mb-2 text-[#D3AF37]">
+                {currentStep > 0 && currentStep <= rumtekHotspots.length 
+                  ? rumtekHotspots[currentStep - 1].title 
+                  : 'Hotspot'}
+              </h2>
+              <p className="text-[#D3AF37]/90 text-sm leading-relaxed">
+                {currentStep > 0 && currentStep <= rumtekHotspots.length 
+                  ? rumtekHotspots[currentStep - 1].description 
+                  : ''}
+              </p>
+            </div>
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#D3AF37]/20">
+              <div className="text-xs text-[#D3AF37]/70">
+                {currentStep}/{rumtekHotspots.length}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handlePreviousHotspot}
+                  size="sm"
+                  variant="outline"
+                  disabled={currentStep === 1}
+                  className="border-[#D3AF37] text-[#D3AF37] hover:bg-[#D3AF37]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ArrowLeft className="mr-2 w-3 h-3" />
+                  Previous
+                </Button>
+                {currentStep < rumtekHotspots.length ? (
+                  <Button
+                    onClick={handleNextHotspot}
+                    size="sm"
+                    className="bg-[#D3AF37] text-[#650304] hover:bg-[#E5C047] font-semibold"
+                  >
+                    Next
+                    <ArrowRight className="ml-2 w-3 h-3" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleEndTour}
+                    size="sm"
+                    className="bg-[#D3AF37] text-[#650304] hover:bg-[#E5C047] font-semibold"
+                  >
+                    Complete
+                  </Button>
+                )}
+                <Button
+                  onClick={handleEndTour}
+                  variant="outline"
+                  size="sm"
+                  className="border-[#D3AF37] text-[#D3AF37] hover:bg-[#D3AF37]/10 px-2"
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

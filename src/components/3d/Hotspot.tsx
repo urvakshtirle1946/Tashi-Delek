@@ -10,6 +10,7 @@ interface HotspotProps {
   color?: string;
   lineTarget?: [number, number, number];
   onHover?: (hovered: boolean) => void;
+  isHighlighted?: boolean;
 }
 
 const Hotspot: React.FC<HotspotProps> = ({ 
@@ -18,7 +19,8 @@ const Hotspot: React.FC<HotspotProps> = ({
   description, 
   color = '#EE4B2B',
   lineTarget = [0, 0, 0],
-  onHover
+  onHover,
+  isHighlighted = false
 }) => {
   const [hovered, setHovered] = useState(false);
   const shadowRef = useRef<THREE.Mesh>(null);
@@ -69,13 +71,26 @@ const Hotspot: React.FC<HotspotProps> = ({
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <circleGeometry args={[0.1, 32]} />
+        <circleGeometry args={[isHighlighted ? 0.15 : 0.1, 32]} />
         <meshBasicMaterial
-          color={dotColor}
+          color={isHighlighted ? '#FFD700' : dotColor}
           transparent={false}
           side={THREE.DoubleSide}
         />
       </mesh>
+      
+      {/* Highlight Ring for Guided Tour */}
+      {isHighlighted && (
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.18, 0.22, 32]} />
+          <meshBasicMaterial
+            color="#FFD700"
+            transparent
+            opacity={0.6}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
 
       {/* Info Card on Hover */}
       {hovered && (

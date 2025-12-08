@@ -58,37 +58,44 @@ const encheyHotspots = [
   {
     position: [0, 1.5, 2.2] as [number, number, number], // Front - reduced height
     lineTarget: [0, 1.2, 0.6] as [number, number, number],
-    title: "Main Shrine",
-    description: "Beautiful prayer hall blessed by Tantric master Druptob Karpo",
-    color: "#D3AF37"
-  },
-  {
-    position: [-2.5, 0.8, 1] as [number, number, number], // Left front - reduced
-    lineTarget: [-0.9, 0.6, 0.4] as [number, number, number],
-    title: "Prayer Wheel Gallery",
-    description: "Row of traditional prayer wheels inscribed with sacred mantras",
-    color: "#FF6B6B"
+    title: "Main prayer hall",
+    description: "The main shrine hall of Enchey Monastery is adorned with vibrant murals, traditional thankas, sacred masks, and statues of important deities such as Guru Padmasambhava and Vajrakilaya. The hall is calm and spiritually charged, used for daily prayers, chanting, and ceremonial rituals",
+    color: "#EE4B2B"
   },
   {
     position: [2.5, 1.3, 0] as [number, number, number], // Right side - reduced
     lineTarget: [1, 1.2, 0] as [number, number, number],
-    title: "Observation Deck",
-    description: "Panoramic views of Gangtok city and Kanchenjunga range",
-    color: "#4ECDC4"
-  },
-  {
-    position: [0, -0.7, -2.5] as [number, number, number], // Bottom back
-    lineTarget: [0, 0, -0.9] as [number, number, number],
-    title: "Sacred Garden",
-    description: "Peaceful meditation garden with ancient pine trees",
-    color: "#95E1D3"
+    title: "Location",
+    description: "Situated about 3 km from Gangtok, the monastery stands atop a forested hill overlooking the town and the distant snow-covered Khangchendzonga range. At around 1,980 meters elevation, the site is believed to be blessed and protected by powerful guardian spirits",
+    color: "#EE4B2B"
   },
   {
     position: [-2, -0.5, 2] as [number, number, number], // Bottom left front
     lineTarget: [-0.7, 0.1, 0.8] as [number, number, number],
-    title: "Entrance Plaza",
-    description: "Welcome courtyard with traditional architecture",
-    color: "#FFD700"
+    title: "Main gate",
+    description: "The entrance follows classic monastic design with prayer wheels lining the pathway, symbolizing purification as visitors enter. The gate marks the transition from the everyday world to a sacred and blessed environment filled with spiritual significance",
+    color: "#EE4B2B"
+  },
+  {
+    position: [-2.5, 0.8, 1] as [number, number, number], // Left front - reduced
+    lineTarget: [-0.9, 0.6, 0.4] as [number, number, number],
+    title: "Artefacts, Statues, Masks & Religious Objects",
+    description: "Inside the monastery you'll see statues of important deities like Buddha, Guru Padmasambhava, old manuscripts, and a notable collection of ritual masks used in ceremonies and masked-dance festivals",
+    color: "#EE4B2B"
+  },
+  {
+    position: [0, -0.7, -2.5] as [number, number, number], // Bottom back
+    lineTarget: [0, 0, -0.9] as [number, number, number],
+    title: "Monks' quarters",
+    description: "The monastery includes simple living quarters for monks who reside there, practicing meditation, chanting, and Buddhist studies. The quarters reflect a disciplined lifestyle and remain an integral part of Enchey's living spiritual community",
+    color: "#EE4B2B"
+  },
+  {
+    position: [2, -0.5, 2.2] as [number, number, number], // Bottom right front
+    lineTarget: [0.8, 0.1, 0.9] as [number, number, number],
+    title: "Exterior",
+    description: "The outdoors includes an open courtyard used for Cham mask dances during festivals like Pang Lhabsol and Losoong. Surrounded by prayer flags fluttering in the wind, the architecture reflects traditional Sikkimese craftsmanship and Tibetan Buddhist aesthetics, blending spiritual beauty with the natural mountain landscape",
+    color: "#EE4B2B"
   }
 ];
 
