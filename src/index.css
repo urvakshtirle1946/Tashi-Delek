@@ -136,7 +136,8 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  html, body {
+  html,
+  body {
     overscroll-behavior-y: none;
     background: transparent !important;
   }
@@ -147,14 +148,62 @@ All colors MUST be HSL.
     min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: hsl(var(--deep-earth-brown));
     font-weight: 700;
     letter-spacing: -0.02em;
   }
 
   /* Body text uses foreground (dark maroon/near-black) */
-  p, span:not([class*="text-"]), div:not([class*="text-"]), li, td, th {
+  p,
+  span:not([class*="text-"]),
+  div:not([class*="text-"]),
+  li,
+  td,
+  th {
     color: hsl(var(--foreground));
   }
+}
+
+/* Custom Hero Section Animations */
+@keyframes bounce-slow {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes scroll-indicator {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateY(8px);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2.5s ease-in-out infinite;
+}
+
+.animate-scroll-indicator {
+  animation: scroll-indicator 1.8s ease-in-out infinite;
 }
