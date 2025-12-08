@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import * as THREE from 'three';
 import VoiceGuide, { ModelInfo } from '@/components/VoiceGuide';
+import Hotspot from '@/components/3d/Hotspot';
 
 // Rumtek Monastery Information for Voice Guide
 const rumtekInfo: ModelInfo = {
@@ -47,16 +48,69 @@ const rumtekInfo: ModelInfo = {
   ]
 };
 
+// Hotspot data for Rumtek Monastery
+const rumtekHotspots = [
+  {
+    position: [0, 1.8, 2.5] as [number, number, number], // Front - reduced height
+    lineTarget: [0, 1.2, 0.8] as [number, number, number],
+    title: "Main Temple Entrance",
+    description: "The grand entrance adorned with traditional Tibetan Buddhist motifs and prayer wheels",
+    color: "#D3AF37"
+  },
+  {
+    position: [-2.5, 1.2, 0] as [number, number, number], // Left side - reduced
+    lineTarget: [-1, 0.9, 0] as [number, number, number],
+    title: "Golden Stupa",
+    description: "Sacred stupa containing relics of the 16th Karmapa, covered in gold leaf",
+    color: "#FFD700"
+  },
+  {
+    position: [2.5, 1.5, 0.5] as [number, number, number], // Right side - reduced
+    lineTarget: [1, 1.2, 0.2] as [number, number, number],
+    title: "Prayer Hall",
+    description: "Main shrine with 4-story high statue of Buddha Shakyamuni",
+    color: "#FF6B6B"
+  },
+  {
+    position: [0.5, -0.7, -2.5] as [number, number, number], // Bottom back
+    lineTarget: [0.2, 0.1, -1] as [number, number, number],
+    title: "Monks' Quarters",
+    description: "Residential area where over 300 monks live and study Buddhist philosophy",
+    color: "#4ECDC4"
+  },
+  {
+    position: [-2.2, 1.8, 1.2] as [number, number, number], // Left front - reduced
+    lineTarget: [-0.8, 1.4, 0.5] as [number, number, number],
+    title: "Bell Tower",
+    description: "Traditional bell used for calling monks to prayer sessions",
+    color: "#95E1D3"
+  },
+  {
+    position: [2, -0.5, -2] as [number, number, number], // Bottom right back
+    lineTarget: [0.8, 0.2, -0.8] as [number, number, number],
+    title: "Meditation Hall",
+    description: "Quiet space for monks' daily meditation practice",
+    color: "#FF9999"
+  }
+];
+
 interface ModelProps {
   isRotating: boolean;
   modelRef: React.RefObject<THREE.Group>;
+  onHotspotHover: (hovered: boolean) => void;
 }
 
-function RumtekModel({ isRotating, modelRef }: ModelProps) {
+function RumtekModel({ isRotating, modelRef, onHotspotHover }: ModelProps) {
   const { scene } = useGLTF('/assets/Models/Rumtek.glb');
+  const isHoveredRef = useRef(false);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    isHoveredRef.current = hovered;
+    onHotspotHover(hovered);
+  };
 
   useFrame((state, delta) => {
-    if (modelRef.current && isRotating) {
+    if (modelRef.current && isRotating && !isHoveredRef.current) {
       modelRef.current.rotation.y += delta * 0.15;
     }
   });
@@ -66,6 +120,19 @@ function RumtekModel({ isRotating, modelRef }: ModelProps) {
   return (
     <group ref={modelRef}>
       <primitive object={clonedScene} scale={2.5} position={[0, 0, 0]} />
+      
+      {/* Hotspots */}
+      {rumtekHotspots.map((hotspot, index) => (
+        <Hotspot
+          key={index}
+          position={hotspot.position}
+          lineTarget={hotspot.lineTarget}
+          title={hotspot.title}
+          description={hotspot.description}
+          color={hotspot.color}
+          onHover={handleHotspotHover}
+        />
+      ))}
     </group>
   );
 }
@@ -73,8 +140,13 @@ function RumtekModel({ isRotating, modelRef }: ModelProps) {
 const RumtekTour = () => {
   const navigate = useNavigate();
   const [isRotating, setIsRotating] = useState(true);
+  const [isHotspotHovered, setIsHotspotHovered] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 0, 10]);
   const modelRef = useRef<THREE.Group>(null);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    setIsHotspotHovered(hovered);
+  };
 
   const resetCamera = () => {
     setCameraPosition([0, 0, 10]);
@@ -157,7 +229,11 @@ const RumtekTour = () => {
           />
 
           {/* 3D Model */}
-          <RumtekModel isRotating={isRotating} modelRef={modelRef} />
+          <RumtekModel 
+            isRotating={isRotating && !isHotspotHovered} 
+            modelRef={modelRef}
+            onHotspotHover={handleHotspotHover}
+          />
 
           {/* Orbit Controls */}
           <OrbitControls

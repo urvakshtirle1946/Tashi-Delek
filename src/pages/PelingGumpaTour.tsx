@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import * as THREE from 'three';
 import VoiceGuide, { ModelInfo } from '@/components/VoiceGuide';
+import Hotspot from '@/components/3d/Hotspot';
 
 // Peling Gumpa Monastery Information for Voice Guide
 const pelingGumpaInfo: ModelInfo = {
@@ -52,11 +53,62 @@ interface ModelProps {
   modelRef: React.RefObject<THREE.Group>;
 }
 
-function PelingGumpaModel({ isRotating, modelRef }: ModelProps) {
+// Hotspot data for Peling Gumpa
+const pelingHotspots = [
+  {
+    position: [0, 1.5, 2.5] as [number, number, number], // Front - reduced height
+    lineTarget: [0, 1.4, 0.7] as [number, number, number],
+    title: "Main Temple",
+    description: "Historic prayer hall with ancient murals and thangka paintings",
+    color: "#D3AF37"
+  },
+  {
+    position: [-2.5, 0.8, 1.5] as [number, number, number], // Left front - reduced
+    lineTarget: [-1, 0.7, 0.5] as [number, number, number],
+    title: "Scripture Library",
+    description: "Rare collection of Buddhist texts and manuscripts",
+    color: "#FF6B6B"
+  },
+  {
+    position: [2.5, 1.3, 0] as [number, number, number], // Right side - reduced
+    lineTarget: [1.1, 1.2, 0] as [number, number, number],
+    title: "Meditation Chamber",
+    description: "Peaceful space for monks' meditation and spiritual practice",
+    color: "#4ECDC4"
+  },
+  {
+    position: [-0.8, -0.7, -2.5] as [number, number, number], // Bottom back
+    lineTarget: [-0.2, 0, -1] as [number, number, number],
+    title: "Courtyard",
+    description: "Central gathering space for ceremonies and festivals",
+    color: "#FFD700"
+  },
+  {
+    position: [2, -0.5, 2.2] as [number, number, number], // Bottom right front
+    lineTarget: [0.8, 0.1, 0.9] as [number, number, number],
+    title: "Garden Path",
+    description: "Scenic pathway through monastery grounds",
+    color: "#95E1D3"
+  }
+];
+
+interface ModelProps {
+  isRotating: boolean;
+  modelRef: React.RefObject<THREE.Group>;
+  onHotspotHover: (hovered: boolean) => void;
+}
+
+function PelingGumpaModel({ isRotating, modelRef, onHotspotHover }: ModelProps) {
   const { scene } = useGLTF('/assets/Models/pelinggumpa.glb');
+  const isHoveredRef = useRef(false);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    isHoveredRef.current = hovered;
+    onHotspotHover(hovered);
+  };
 
   useFrame((state, delta) => {
-    if (modelRef.current && isRotating) {
+    if (modelRef.current && isRotating && !isHoveredRef.current) {
       modelRef.current.rotation.y += delta * 0.15;
     }
   });
@@ -66,6 +118,19 @@ function PelingGumpaModel({ isRotating, modelRef }: ModelProps) {
   return (
     <group ref={modelRef}>
       <primitive object={clonedScene} scale={2.5} position={[0, 0, 0]} />
+      
+      {/* Hotspots */}
+      {pelingHotspots.map((hotspot, index) => (
+        <Hotspot
+          key={index}
+          position={hotspot.position}
+          lineTarget={hotspot.lineTarget}
+          title={hotspot.title}
+          description={hotspot.description}
+          color={hotspot.color}
+          onHover={handleHotspotHover}
+        />
+      ))}
     </group>
   );
 }
@@ -73,8 +138,13 @@ function PelingGumpaModel({ isRotating, modelRef }: ModelProps) {
 const PelingGumpaTour = () => {
   const navigate = useNavigate();
   const [isRotating, setIsRotating] = useState(true);
+  const [isHotspotHovered, setIsHotspotHovered] = useState(false);
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([0, 0, 10]);
   const modelRef = useRef<THREE.Group>(null);
+
+  const handleHotspotHover = (hovered: boolean) => {
+    setIsHotspotHovered(hovered);
+  };
 
   const resetCamera = () => {
     setCameraPosition([0, 0, 10]);
@@ -157,7 +227,11 @@ const PelingGumpaTour = () => {
           />
 
           {/* 3D Model */}
-          <PelingGumpaModel isRotating={isRotating} modelRef={modelRef} />
+          <PelingGumpaModel 
+            isRotating={isRotating && !isHotspotHovered} 
+            modelRef={modelRef}
+            onHotspotHover={handleHotspotHover}
+          />
 
           {/* Orbit Controls */}
           <OrbitControls
