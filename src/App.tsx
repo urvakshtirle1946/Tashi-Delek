@@ -7,6 +7,7 @@ import { AudioProvider } from "@/contexts/AudioContext";
 import Loader from "@/components/Loader";
 import Navigation from "@/components/Navigation";
 import SmoothScroll from "@/components/SmoothScroll";
+import OfflineIndicator from "@/components/OfflineIndicator";
 import Index from "./pages/Index";
 import VirtualTours from "./pages/VirtualTours";
 import RumtekTour from "./pages/RumtekTour";
@@ -63,6 +64,7 @@ const App = () => {
           }}
         >
           <ConditionalNavigation />
+          <OfflineIndicator />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tours" element={<VirtualTours />} />
