@@ -49,7 +49,7 @@ export function ExpandableCard({
     };
   }, []);
 
-  // Prevent body scroll when card is open
+  // Prevent body scroll when card is open and handle scroll container
   React.useEffect(() => {
     if (active) {
       // Save current scroll position
@@ -59,6 +59,33 @@ export function ExpandableCard({
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
+      
+      // Find and focus the scroll container
+      const scrollContainer = cardRef.current?.querySelector('[data-lenis-prevent]') as HTMLElement;
+      if (scrollContainer) {
+        scrollContainer.focus();
+        
+        // Ensure wheel events work by handling them directly
+        const handleWheel = (e: WheelEvent) => {
+          const target = e.target as HTMLElement;
+          if (scrollContainer.contains(target) || target === scrollContainer) {
+            // Allow native scrolling
+            e.stopPropagation();
+          }
+        };
+        
+        scrollContainer.addEventListener('wheel', handleWheel, { passive: false });
+        
+        return () => {
+          // Restore body scroll
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.width = '';
+          document.body.style.overflow = '';
+          window.scrollTo(0, scrollY);
+          scrollContainer.removeEventListener('wheel', handleWheel);
+        };
+      }
       
       return () => {
         // Restore body scroll
@@ -151,7 +178,15 @@ export function ExpandableCard({
                     </motion.div>
                   </motion.button>
                 </div>
-                <div className="relative px-6 sm:px-8 pb-10 flex-1 overflow-y-auto">
+                <div 
+                  data-lenis-prevent
+                  tabIndex={0}
+                  className="relative px-6 sm:px-8 pb-10 flex-1 overflow-y-auto overflow-x-hidden scroll-smooth touch-pan-y pointer-events-auto"
+                  style={{ 
+                    WebkitOverflowScrolling: 'touch',
+                    overscrollBehavior: 'contain'
+                  }}
+                >
                   <motion.div
                     layout
                     initial={{ opacity: 0 }}

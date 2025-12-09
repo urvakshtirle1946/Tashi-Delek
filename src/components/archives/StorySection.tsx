@@ -80,7 +80,31 @@ const StorySection = () => {
       readerElement.addEventListener('scroll', handleScroll);
       // Initial scroll position
       readerElement.scrollTop = 0;
+      
+      // Focus the scroll container to ensure it can receive wheel events
+      readerElement.focus();
+      
+      // Ensure wheel events work by handling them directly
+      const handleWheel = (e: WheelEvent) => {
+        const target = e.target as HTMLElement;
+        if (readerElement.contains(target) || target === readerElement) {
+          // Allow native scrolling
+          e.stopPropagation();
+        }
+      };
+      
+      readerElement.addEventListener('wheel', handleWheel, { passive: false });
+      
+      return () => {
+        document.body.style.overflow = '';
+        readerElement.removeEventListener('scroll', handleScroll);
+        readerElement.removeEventListener('wheel', handleWheel);
+      };
     }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
 
     return () => {
       document.body.style.overflow = '';
@@ -245,7 +269,13 @@ const StorySection = () => {
             {/* Scrollable Content Area */}
             <div
               id="manga-reader-scroll"
-              className="absolute inset-0 pt-[104px] overflow-y-auto overflow-x-hidden scroll-smooth"
+              data-lenis-prevent
+              tabIndex={0}
+              className="absolute top-[104px] left-0 right-0 bottom-0 overflow-y-auto overflow-x-hidden scroll-smooth touch-pan-y pointer-events-auto"
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain'
+              }}
             >
 
               {/* Top Padding for Header */}
