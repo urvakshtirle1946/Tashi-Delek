@@ -102,12 +102,12 @@ const StorySection = () => {
           <BookOpen className="w-5 h-5 text-parchment-700" />
           <span className="text-sm font-medium text-parchment-800 uppercase tracking-wider">Visual Stories</span>
         </div>
-        
+
         <h2 className="text-4xl md:text-5xl font-serif font-bold text-ink-900 mb-4">
           Sacred Tales & Legends
         </h2>
         <p className="text-lg text-ink-600 max-w-2xl mx-auto font-light">
-          Immerse yourself in our collection of illustrated stories, 
+          Immerse yourself in our collection of illustrated stories,
           where ancient wisdom meets artistic expression
         </p>
       </motion.div>
@@ -124,16 +124,16 @@ const StorySection = () => {
             onMouseEnter={() => setHoveredStory(story.id)}
             onMouseLeave={() => setHoveredStory(null)}
           >
-              {/* Story Card */}
-              <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-parchment-200 transition-all duration-500 hover:shadow-2xl hover:scale-[1.02]">
-                
-                {/* Image Container - Shorter height */}
-                <div className="relative aspect-[5/4] overflow-hidden bg-parchment-100">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
-                
+            {/* Story Card */}
+            <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-parchment-200 transition-all duration-500 hover:shadow-2xl hover:scale-[1.02]">
+
+              {/* Image Container - Shorter height */}
+              <div className="relative aspect-[5/4] overflow-hidden bg-parchment-100">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
+
                 {/* Cover Image */}
-                <img 
-                  src={story.coverImage} 
+                <img
+                  src={story.coverImage}
                   alt={`${story.title} cover`}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -166,36 +166,36 @@ const StorySection = () => {
                 </motion.div>
               </div>
 
-                {/* Content */}
-                <div className="p-4 md:p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-serif text-parchment-600 italic">
-                      {story.year}
-                    </span>
-                    <span className="text-xs text-ink-500 uppercase tracking-wide">
-                      {story.author}
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl font-serif font-bold text-ink-900 mb-2 group-hover:text-parchment-700 transition-colors">
-                    {story.title}
-                  </h3>
-                  
-                  <p className="text-sm text-ink-600 leading-relaxed mb-3">
-                    {story.description}
-                  </p>
-
-                  <button
-                    onClick={() => {
-                      setSelectedStory(story);
-                      setScrollProgress(0);
-                    }}
-                    className="inline-flex items-center gap-1.5 text-sm text-parchment-700 font-semibold hover:text-parchment-900 transition-colors group/btn"
-                  >
-                    Start Reading
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
-                  </button>
+              {/* Content */}
+              <div className="p-4 md:p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-serif text-parchment-600 italic">
+                    {story.year}
+                  </span>
+                  <span className="text-xs text-ink-500 uppercase tracking-wide">
+                    {story.author}
+                  </span>
                 </div>
+
+                <h3 className="text-xl font-serif font-bold text-ink-900 mb-2 group-hover:text-parchment-700 transition-colors">
+                  {story.title}
+                </h3>
+
+                <p className="text-sm text-ink-600 leading-relaxed mb-3">
+                  {story.description}
+                </p>
+
+                <button
+                  onClick={() => {
+                    setSelectedStory(story);
+                    setScrollProgress(0);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-sm text-parchment-700 font-semibold hover:text-parchment-900 transition-colors group/btn"
+                >
+                  Start Reading
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
+                </button>
+              </div>
             </div>
           </motion.div>
         ))}
@@ -245,13 +245,9 @@ const StorySection = () => {
             {/* Scrollable Content Area */}
             <div
               id="manga-reader-scroll"
-              className="fixed inset-0 top-[88px] md:top-[104px] w-full overflow-y-auto overflow-x-hidden scroll-smooth"
-              style={{ 
-                scrollbarWidth: 'thin', 
-                scrollbarColor: '#d9a071 #1a1a1a',
-                WebkitOverflowScrolling: 'touch'
-              }}
+              className="absolute inset-0 pt-[104px] overflow-y-auto overflow-x-hidden scroll-smooth"
             >
+
               {/* Top Padding for Header */}
               <div className="h-2" />
 
