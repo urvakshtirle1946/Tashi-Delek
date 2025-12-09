@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, ArrowLeft, Star, Clock, MapPin, Languages, BookOpen, MessageCircle, Loader2 } from "lucide-react";
+import { Users, ArrowLeft, Star, MapPin, Mail, Phone, ShieldCheck, Loader2, BookOpen, Languages } from "lucide-react";
 import MuteButton from "@/components/MuteButton";
 import { vendorAPI } from "@/lib/api";
 
@@ -37,7 +37,7 @@ const GuidesPage = () => {
       setLoading(true);
       setError(null);
       const response = await vendorAPI.getAll({ limit: 100 });
-      
+
       if (response.success && response.data.vendors) {
         setVendors(response.data.vendors);
       }
@@ -52,42 +52,28 @@ const GuidesPage = () => {
   };
 
   // Transform vendor data to guide format
-  const transformVendorToGuide = (vendor: Vendor, index: number) => {
-    const photoUrl = vendor.photo 
+  const transformVendorToGuide = (vendor: Vendor) => {
+    const photoUrl = vendor.photo
       ? (typeof vendor.photo === 'string' ? vendor.photo : vendor.photo.url)
-      : '/api/placeholder/150/150';
-    
-    // Calculate experience based on creation date (mock)
-    const yearsSinceJoin = Math.floor((new Date().getTime() - new Date(vendor.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365));
-    const experience = yearsSinceJoin > 0 ? `${yearsSinceJoin} years` : 'New guide';
-    
-    // Default values for missing data
-    const rating = vendor.stats?.rating || 4.5 + (index % 3) * 0.2; // Mock rating between 4.5-5.0
-    const reviews = vendor.stats?.bookings || Math.floor(Math.random() * 100) + 50;
-    
+      : '/api/placeholder/300/200';
+    const rating = vendor.stats?.rating || 0;
+    const packages = vendor.stats?.packages || 0;
+    const bookings = vendor.stats?.bookings || 0;
     return {
       id: vendor.id,
       name: vendor.name,
-      specialization: vendor.businessName || 'Tour Guide',
-      rating: parseFloat(rating.toFixed(1)),
-      reviews: reviews,
-      languages: ['English', 'Hindi', 'Local'], // Default languages
-      experience: experience,
-      location: 'Sikkim', // Default location
-      price: `₹${Math.floor(Math.random() * 2000) + 1500}/day`, // Mock price
-      expertise: [
-        vendor.stats?.packages ? `${vendor.stats.packages} Packages` : 'Tour Packages',
-        'Local Knowledge',
-        'Cultural Heritage'
-      ],
+      businessName: vendor.businessName || 'Guide',
       image: photoUrl,
       email: vendor.email,
       phone: vendor.phone,
-      verificationStatus: vendor.verificationStatus
+      verificationStatus: vendor.verificationStatus,
+      rating,
+      packages,
+      bookings,
     };
   };
 
-  const guides = vendors.map((vendor, index) => transformVendorToGuide(vendor, index));
+  const guides = vendors.map((vendor) => transformVendorToGuide(vendor));
 
   const tourTypes = [
     {
@@ -152,36 +138,9 @@ const GuidesPage = () => {
                 <span className="bg-gradient-to-r from-monastery-blue to-primary bg-clip-text text-transparent"> Guide Booking</span>
               </h1>
               <p className="text-lg text-muted-foreground">
-                Connect with expert local guides, historians, and spiritual teachers. 
+                Connect with expert local guides, historians, and spiritual teachers.
                 Choose from in-person tours, virtual experiences, or hybrid sessions.
               </p>
-            </div>
-
-            {/* Tour Types */}
-            <div className="grid md:grid-cols-3 gap-6 mb-16">
-              {tourTypes.map((tour, index) => (
-                <Card key={index} className="border-0 bg-card/80 backdrop-blur-sm text-center">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{tour.type}</CardTitle>
-                    <CardDescription>{tour.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-sm">
-                      <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-2">
-                        <Clock className="w-3 h-3" />
-                        <span>{tour.duration}</span>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      {tour.features.map((feature, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs mr-1">
-                          {feature}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
 
             {/* Guides Grid */}
@@ -198,111 +157,62 @@ const GuidesPage = () => {
                 </Button>
               </div>
             ) : guides.length > 0 ? (
-              <div className="grid lg:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {guides.map((guide) => (
-                <Card key={guide.id} className={`group hover:shadow-monastery transition-[var(--transition-monastery)] border-0 bg-card/80 backdrop-blur-sm overflow-hidden ${
-                  selectedGuide === guide.id ? 'ring-2 ring-primary' : ''
-                }`}>
-                  <CardHeader className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden relative">
-                      <img 
-                        src={guide.image} 
-                        alt={guide.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/api/placeholder/150/150';
-                        }}
-                      />
-                      {guide.verificationStatus === 'VERIFIED' && (
-                        <Badge className="absolute bottom-0 right-0 bg-green-500 text-white text-xs px-1.5 py-0.5">
-                          ✓ Verified
-                        </Badge>
+                  <Card key={guide.id} className="overflow-hidden border border-border/40">
+                    <div className="h-40 bg-muted overflow-hidden flex items-center justify-center">
+                      {guide.image && !guide.image.includes('/api/placeholder') ? (
+                        <img src={guide.image} alt={guide.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-monastery-blue/30 to-primary/30 text-white flex items-center justify-center text-xl font-semibold">
+                          {guide.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()}
+                        </div>
                       )}
                     </div>
-                    <CardTitle className="text-lg">{guide.name}</CardTitle>
-                    <CardDescription>{guide.specialization}</CardDescription>
-                    
-                    <div className="flex items-center justify-center space-x-1 mt-2">
-                      <Star className="w-4 h-4 fill-monastery-gold text-monastery-gold" />
-                      <span className="text-sm font-medium">{guide.rating}</span>
-                      <span className="text-xs text-muted-foreground">({guide.reviews} reviews)</span>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Experience:</span>
-                        <div className="font-medium">{guide.experience}</div>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">{guide.name}</CardTitle>
+                        {guide.verificationStatus === 'VERIFIED' && (
+                          <Badge className="flex items-center gap-1 bg-green-600 text-white">
+                            <ShieldCheck className="w-3 h-3" /> Verified
+                          </Badge>
+                        )}
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">Location:</span>
-                        <div className="font-medium flex items-center">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {guide.location}
+                      <div className="text-sm text-muted-foreground">{guide.businessName}</div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span>{guide.rating.toFixed(1)} · {guide.bookings} bookings</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">Packages: {guide.packages}</div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Mail className="w-4 h-4" />
+                        <span>{guide.email}</span>
+                      </div>
+                      {guide.phone && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Phone className="w-4 h-4" />
+                          <span>{guide.phone}</span>
                         </div>
+                      )}
+                      <div className="flex items-center gap-2 text-sm">
+                        <MapPin className="w-4 h-4" />
+                        <span>Sikkim</span>
                       </div>
-                    </div>
-
-                    <div>
-                      <span className="text-muted-foreground text-sm">Languages:</span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {guide.languages.map((lang, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            <Languages className="w-2 h-2 mr-1" />
-                            {lang}
-                          </Badge>
-                        ))}
+                      <div className="pt-2 border-t border-border/30 flex gap-2">
+                        <Button className="flex-1">View Profile</Button>
+                        <Button variant="outline" className="flex-1">Contact</Button>
                       </div>
-                    </div>
-
-                    <div>
-                      <span className="text-muted-foreground text-sm">Expertise:</span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {guide.expertise.map((skill, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="text-center pt-2 border-t border-border/20">
-                      <div className="text-xl font-bold text-primary mb-1">{guide.price}</div>
-                      <div className="text-xs text-muted-foreground">Professional guide service</div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Button 
-                        className="w-full bg-gradient-to-r from-monastery-blue to-primary"
-                        onClick={() => handleBookGuide(guide.id)}
-                      >
-                        {selectedGuide === guide.id ? 'Selected!' : 'Book In-Person'}
-                      </Button>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleVirtualTour(guide.id)}
-                        >
-                          <BookOpen className="w-3 h-3 mr-1" />
-                          Virtual Tour
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleMessage(guide.id)}
-                        >
-                          <MessageCircle className="w-3 h-3 mr-1" />
-                          Message
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            ) : null}
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">No guides found.</div>
+            )}
+
+            {/* Removed old mock sections; focused on vendor cards */}
 
             {/* Benefits Section */}
             <div className="mt-20 text-center">
