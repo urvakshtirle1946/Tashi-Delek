@@ -10,6 +10,8 @@ interface PricingTier {
     features: string[];
     popular?: boolean;
     color: string;
+    // Internal identifier to link to backend package
+    pkgId?: string;
 }
 
 function CreativePricing({
@@ -17,11 +19,13 @@ function CreativePricing({
     title = "Make Short Videos That Pop",
     description = "Edit, enhance, and go viral in minutes",
     tiers,
+    onBook,
 }: {
     tag?: string;
     title?: string;
     description?: string;
     tiers: PricingTier[];
+    onBook?: (tier: PricingTier, index: number) => void;
 }) {
     return (
         <div className="w-full max-w-6xl mx-auto px-4">
@@ -141,19 +145,20 @@ function CreativePricing({
                                     "hover:translate-x-[-2px] hover:translate-y-[-2px]",
                                     tier.popular
                                         ? [
-                                              "bg-[#D3AF37] text-zinc-900",
-                                              "hover:bg-[#E5C047]",
-                                              "active:bg-[#D3AF37]",
-                                              "dark:hover:bg-[#E5C047]",
-                                              "dark:active:bg-[#D3AF37]",
-                                          ]
+                                            "bg-[#D3AF37] text-zinc-900",
+                                            "hover:bg-[#E5C047]",
+                                            "active:bg-[#D3AF37]",
+                                            "dark:hover:bg-[#E5C047]",
+                                            "dark:active:bg-[#D3AF37]",
+                                        ]
                                         : [
-                                              "bg-zinc-50 dark:bg-zinc-800",
-                                              "text-zinc-900 dark:text-white",
-                                              "hover:bg-white dark:hover:bg-zinc-700",
-                                              "active:bg-zinc-50 dark:active:bg-zinc-800",
-                                          ]
+                                            "bg-zinc-50 dark:bg-zinc-800",
+                                            "text-zinc-900 dark:text-white",
+                                            "hover:bg-white dark:hover:bg-zinc-700",
+                                            "active:bg-zinc-50 dark:active:bg-zinc-800",
+                                        ]
                                 )}
+                                onClick={() => onBook && onBook(tier, index)}
                             >
                                 Book Now
                             </Button>

@@ -24,6 +24,9 @@ import GuidesPage from "./pages/Guides";
 import CommunityPage from "./pages/Community";
 import Archives from "./pages/Archives";
 import NotFound from "./pages/NotFound";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import { GOOGLE_MAPS_API_KEY, GOOGLE_LIBRARIES } from "@/components/ui/google-map";
 
 // Component to conditionally render Navigation
@@ -86,6 +89,9 @@ const App = () => {
               <Route path="/food" element={<FoodPage />} />
               <Route path="/guides" element={<GuidesPage />} />
               <Route path="/archives" element={<Archives />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
