@@ -233,3 +233,54 @@ All colors MUST be HSL.
 .animate-scroll-indicator {
   animation: scroll-indicator 1.8s ease-in-out infinite;
 }
+
+/* Archive Mandala Backgrounds */
+.mandala-bottom-left {
+  content: '';
+  position: fixed;
+  width: 907px;
+  height: 907px;
+  background-image: url('/mandala-bg.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+  bottom: -454px;
+  left: -454px;
+}
+
+.mandala-bottom-right {
+  content: '';
+  position: fixed;
+  width: 907px;
+  height: 907px;
+  background-image: url('/mandala-bg.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+  bottom: -454px;
+  right: -454px;
+}
+
+/* Custom Scrollbar for Manga Reader */
+#manga-reader-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+#manga-reader-scroll::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+#manga-reader-scroll::-webkit-scrollbar-thumb {
+  background: #d9a071;
+  border-radius: 4px;
+}
+
+#manga-reader-scroll::-webkit-scrollbar-thumb:hover {
+  background: #cd8756;
+}

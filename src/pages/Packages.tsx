@@ -54,11 +54,11 @@ const TravelPackagesPage = () => {
       setLoading(true);
       setError(null);
       const response = await packageAPI.getAll({ limit: 100 }); // Get all packages
-      
+
       if (response.success && response.data.packages) {
         // Store raw packages data for chatbot
         setPackagesData(response.data.packages.filter((pkg: any) => pkg.status === 'ACTIVE'));
-        
+
         // Transform backend packages to PricingTier format
         const transformedPackages: PricingTier[] = response.data.packages
           .filter((pkg: any) => pkg.status === 'ACTIVE') // Only show active packages
@@ -67,13 +67,13 @@ const TravelPackagesPage = () => {
             const features = pkg.description
               ? pkg.description.split('\n').filter((line: string) => line.trim()).slice(0, 6)
               : [
-                  `${pkg.duration || 'Custom Duration'}`,
-                  `Visit ${pkg.location}`,
-                  'Professional Guide',
-                  'All Meals Included',
-                  'Transportation',
-                  '24/7 Support'
-                ];
+                `${pkg.duration || 'Custom Duration'}`,
+                `Visit ${pkg.location}`,
+                'Professional Guide',
+                'All Meals Included',
+                'Transportation',
+                '24/7 Support'
+              ];
 
             return {
               name: pkg.packageName || 'Travel Package',
@@ -92,14 +92,14 @@ const TravelPackagesPage = () => {
       console.error('Error fetching packages:', err);
       const errorMessage = err.message || 'Failed to load packages';
       setError(errorMessage);
-      
+
       // Show more helpful error message
       if (errorMessage.includes('Cannot connect to backend')) {
         setError('Backend server is not running. Please start the backend server on port 8000.');
       } else {
         setError(errorMessage);
       }
-      
+
       // Fallback to default packages if API fails
       setPricingTiers([
         {
@@ -235,6 +235,13 @@ const TravelPackagesPage = () => {
           description: pkg.description?.substring(0, 100) || `Explore ${pkg.location}`,
         })) : []} 
       />
+      
+      {/* Debug: Check if component is rendering */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{ position: 'fixed', bottom: '80px', right: '20px', zIndex: 10000, background: 'red', color: 'white', padding: '5px', fontSize: '10px' }}>
+          Chatbot Component Mounted
+        </div>
+      )}
     </div>
   );
 };

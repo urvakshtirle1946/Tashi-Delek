@@ -73,6 +73,32 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Archive colors
+        parchment: {
+          50: '#fdfbf7',
+          100: '#fbf7ef',
+          200: '#f5eadb',
+          300: '#edd8c0',
+          400: '#e2bd9a',
+          500: '#d9a071',
+          600: '#cd8756',
+          700: '#650304',
+          800: '#8c553e',
+          900: '#714636',
+          950: '#3d241b',
+        },
+        ink: {
+          900: '#1a1a1a',
+          800: '#2a2a2a',
+          700: '#3a3a3a',
+          600: '#4a4a4a',
+          500: '#5a5a5a',
+        },
+      },
+      fontFamily: {
+        handwritten: ["Kalam", "Comic Sans MS", "cursive"],
+        serif: ['"Playfair Display"', 'serif'],
+        sans: ['"Inter"', 'sans-serif'],
       },
       fontFamily: {
         handwritten: ["Kalam", "Comic Sans MS", "cursive"],

@@ -361,20 +361,29 @@ const PackagesChatbot: React.FC<PackagesChatbotProps> = ({ packages = [], classN
     console.log('PackagesChatbot rendered', { isOpen, packagesCount: packages.length });
   }, [isOpen, packages.length]);
 
+  // Always render the component
   return (
-    <>
+    <div 
+      className="fixed bottom-4 right-4 z-[9999]" 
+      style={{ 
+        position: 'fixed', 
+        pointerEvents: 'auto',
+        display: 'block'
+      }}
+    >
       {/* Chat Button - Always show when closed */}
       {!isOpen && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
-          className="fixed bottom-4 right-4 z-[9999]"
+          style={{ display: 'block' }}
         >
           <Button
             onClick={toggleChat}
             size="lg"
             className="rounded-full h-14 w-14 shadow-2xl bg-gradient-to-r from-primary to-monastery-gold hover:from-primary/90 hover:to-monastery-gold/90 text-white"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <MessageCircle className="h-6 w-6" />
           </Button>
@@ -580,7 +589,7 @@ const PackagesChatbot: React.FC<PackagesChatbotProps> = ({ packages = [], classN
             )}
           </motion.div>
         )}
-    </>
+    </div>
   );
 };
 

@@ -127,37 +127,92 @@ const callGroqAPI = async (messages: Message[]): Promise<string> => {
   }
 };
 
-// Voice synthesis helper
-const speak = (text: string, onEnd?: () => void): SpeechSynthesisUtterance | null => {
-  if (!('speechSynthesis' in window)) {
-    console.warn('Speech synthesis not supported');
+// ElevenLabs API Configuration
+const ELEVENLABS_API_KEY = 'sk_6beffbfbbd6e5cfa97d4f573384be47932b86438fb23ae94';
+const ELEVENLABS_VOICE_ID = 'siw1N9V8LmYeEWKyWBxv';
+const ELEVENLABS_API_URL = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`;
+
+// Voice synthesis helper using ElevenLabs
+const speak = async (text: string, onEnd?: () => void): Promise<HTMLAudioElement | null> => {
+  try {
+    // Cancel any ongoing speech
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
+    // Call ElevenLabs API
+    const response = await fetch(ELEVENLABS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'audio/mpeg',
+        'Content-Type': 'application/json',
+        'xi-api-key': ELEVENLABS_API_KEY,
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.0,
+          use_speaker_boost: true
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`ElevenLabs API error: ${response.status}`);
+    }
+
+    // Get audio blob
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    // Create audio element and play
+    const audio = new Audio(audioUrl);
+    audio.volume = 1;
+
+    if (onEnd) {
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        onEnd();
+      };
+    } else {
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+    }
+
+    await audio.play();
+    return audio;
+  } catch (error) {
+    console.error('ElevenLabs TTS Error:', error);
+    // Fallback to browser speech synthesis if ElevenLabs fails
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v =>
+        v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium') || v.name.includes('Samantha'))
+      ) || voices.find(v => v.lang.includes('en-US') || v.lang.includes('en-IN')) || voices[0];
+
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+
+      if (onEnd) {
+        utterance.onend = onEnd;
+      }
+
+      window.speechSynthesis.speak(utterance);
+      return null;
+    }
     return null;
   }
-
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.95;
-  utterance.pitch = 1;
-  utterance.volume = 1;
-
-  // Try to get a good voice
-  const voices = window.speechSynthesis.getVoices();
-  const preferredVoice = voices.find(v =>
-    v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium') || v.name.includes('Samantha'))
-  ) || voices.find(v => v.lang.includes('en-US') || v.lang.includes('en-IN')) || voices[0];
-
-  if (preferredVoice) {
-    utterance.voice = preferredVoice;
-  }
-
-  if (onEnd) {
-    utterance.onend = onEnd;
-  }
-
-  window.speechSynthesis.speak(utterance);
-  return utterance;
 };
 
 // Quick action buttons data
@@ -183,6 +238,7 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
 
   const recognitionRef = useRef<any>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize system prompt
   useEffect(() => {
@@ -255,6 +311,11 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
+      // Cleanup audio
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
       window.speechSynthesis?.cancel();
     };
   }, []);
@@ -297,9 +358,12 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
       // Speak the response if not muted
       if (!isMuted) {
         setIsSpeaking(true);
-        speak(responseText, () => {
+        const audio = await speak(responseText, () => {
           setIsSpeaking(false);
         });
+        if (audio) {
+          currentAudioRef.current = audio;
+        }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to get response';
@@ -360,6 +424,11 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
         setIsListening(true);
 
         // Stop any ongoing speech
+        if (currentAudioRef.current) {
+          currentAudioRef.current.pause();
+          currentAudioRef.current.currentTime = 0;
+          currentAudioRef.current = null;
+        }
         window.speechSynthesis?.cancel();
         setIsSpeaking(false);
       } catch (err) {
@@ -373,6 +442,13 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
   // Toggle mute
   const toggleMute = useCallback(() => {
     if (!isMuted) {
+      // Stop ElevenLabs audio
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+        currentAudioRef.current = null;
+      }
+      // Stop browser speech synthesis as fallback
       window.speechSynthesis?.cancel();
       setIsSpeaking(false);
     }
@@ -381,6 +457,13 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
 
   // Stop speaking
   const stopSpeaking = useCallback(() => {
+    // Stop ElevenLabs audio
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
+    }
+    // Stop browser speech synthesis as fallback
     window.speechSynthesis?.cancel();
     setIsSpeaking(false);
   }, []);
@@ -409,6 +492,10 @@ const VoiceGuide: React.FC<VoiceGuideProps> = ({ modelInfo, className }) => {
         setIsSpeaking(true);
         speak(welcomeMessage, () => {
           setIsSpeaking(false);
+        }).then((audio) => {
+          if (audio) {
+            currentAudioRef.current = audio;
+          }
         });
       }
     } else if (isOpen && !GROQ_API_KEY) {

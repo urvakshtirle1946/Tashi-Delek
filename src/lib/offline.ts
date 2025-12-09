@@ -3,7 +3,7 @@
 
 let db: IDBDatabase | null = null;
 const DB_NAME = 'TashiDelekDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Increment to force database upgrade
 
 // Initialize IndexedDB using native API
 export function initDB(): Promise<IDBDatabase> {
@@ -24,22 +24,27 @@ export function initDB(): Promise<IDBDatabase> {
     request.onupgradeneeded = (event) => {
       const database = (event.target as IDBOpenDBRequest).result;
 
-      // API Cache store
-      if (!database.objectStoreNames.contains('apiCache')) {
-        database.createObjectStore('apiCache', { keyPath: 'url' });
+      // Delete old object stores if they exist (for clean upgrade)
+      if (database.objectStoreNames.contains('apiCache')) {
+        database.deleteObjectStore('apiCache');
+      }
+      if (database.objectStoreNames.contains('packages')) {
+        database.deleteObjectStore('packages');
+      }
+      if (database.objectStoreNames.contains('vendors')) {
+        database.deleteObjectStore('vendors');
       }
 
-      // Packages store
-      if (!database.objectStoreNames.contains('packages')) {
-        const packagesStore = database.createObjectStore('packages', { keyPath: 'id' });
-        packagesStore.createIndex('timestamp', 'timestamp');
-      }
+      // Create API Cache store
+      database.createObjectStore('apiCache', { keyPath: 'url' });
 
-      // Vendors store
-      if (!database.objectStoreNames.contains('vendors')) {
-        const vendorsStore = database.createObjectStore('vendors', { keyPath: 'id' });
-        vendorsStore.createIndex('timestamp', 'timestamp');
-      }
+      // Create Packages store
+      const packagesStore = database.createObjectStore('packages', { keyPath: 'id' });
+      packagesStore.createIndex('timestamp', 'timestamp');
+
+      // Create Vendors store
+      const vendorsStore = database.createObjectStore('vendors', { keyPath: 'id' });
+      vendorsStore.createIndex('timestamp', 'timestamp');
     };
   });
 }
@@ -105,6 +110,13 @@ export async function getCachedApiResponse(url: string): Promise<any | null> {
 export async function storePackages(packages: any[]): Promise<void> {
   try {
     const database = await initDB();
+    
+    // Check if object store exists
+    if (!database.objectStoreNames.contains('packages')) {
+      console.warn('Packages object store does not exist, skipping store');
+      return;
+    }
+    
     const tx = database.transaction('packages', 'readwrite');
     const store = tx.objectStore('packages');
     
@@ -123,6 +135,7 @@ export async function storePackages(packages: any[]): Promise<void> {
     await Promise.all(promises);
   } catch (error) {
     console.error('Failed to store packages:', error);
+    // Silently fail - don't break the app
   }
 }
 
@@ -206,52 +219,63 @@ export async function clearOldCache(): Promise<void> {
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
     // Clear old API cache
-    const apiTx = database.transaction('apiCache', 'readwrite');
-    const apiStore = apiTx.objectStore('apiCache');
-    const apiRequest = apiStore.openCursor();
-    
-    apiRequest.onsuccess = (event) => {
-      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-      if (cursor) {
-        const item = cursor.value;
-        if (item.timestamp < sevenDaysAgo) {
-          cursor.delete();
+    if (database.objectStoreNames.contains('apiCache')) {
+      const apiTx = database.transaction('apiCache', 'readwrite');
+      const apiStore = apiTx.objectStore('apiCache');
+      const apiRequest = apiStore.openCursor();
+      
+      apiRequest.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          const item = cursor.value;
+          if (item.timestamp < sevenDaysAgo) {
+            cursor.delete();
+          }
+          cursor.continue();
         }
-        cursor.continue();
-      }
-    };
+      };
+    }
 
     // Clear old packages
-    const packagesTx = database.transaction('packages', 'readwrite');
-    const packagesStore = packagesTx.objectStore('packages');
-    const packagesIndex = packagesStore.index('timestamp');
-    const packagesRange = IDBKeyRange.upperBound(sevenDaysAgo);
-    const packagesRequest = packagesIndex.openCursor(packagesRange);
-    
-    packagesRequest.onsuccess = (event) => {
-      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-      if (cursor) {
-        cursor.delete();
-        cursor.continue();
+    if (database.objectStoreNames.contains('packages')) {
+      const packagesTx = database.transaction('packages', 'readwrite');
+      const packagesStore = packagesTx.objectStore('packages');
+      if (packagesStore.indexNames.contains('timestamp')) {
+        const packagesIndex = packagesStore.index('timestamp');
+        const packagesRange = IDBKeyRange.upperBound(sevenDaysAgo);
+        const packagesRequest = packagesIndex.openCursor(packagesRange);
+        
+        packagesRequest.onsuccess = (event) => {
+          const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+          if (cursor) {
+            cursor.delete();
+            cursor.continue();
+          }
+        };
       }
-    };
+    }
 
     // Clear old vendors
-    const vendorsTx = database.transaction('vendors', 'readwrite');
-    const vendorsStore = vendorsTx.objectStore('vendors');
-    const vendorsIndex = vendorsStore.index('timestamp');
-    const vendorsRange = IDBKeyRange.upperBound(sevenDaysAgo);
-    const vendorsRequest = vendorsIndex.openCursor(vendorsRange);
-    
-    vendorsRequest.onsuccess = (event) => {
-      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-      if (cursor) {
-        cursor.delete();
-        cursor.continue();
+    if (database.objectStoreNames.contains('vendors')) {
+      const vendorsTx = database.transaction('vendors', 'readwrite');
+      const vendorsStore = vendorsTx.objectStore('vendors');
+      if (vendorsStore.indexNames.contains('timestamp')) {
+        const vendorsIndex = vendorsStore.index('timestamp');
+        const vendorsRange = IDBKeyRange.upperBound(sevenDaysAgo);
+        const vendorsRequest = vendorsIndex.openCursor(vendorsRange);
+        
+        vendorsRequest.onsuccess = (event) => {
+          const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+          if (cursor) {
+            cursor.delete();
+            cursor.continue();
+          }
+        };
       }
-    };
+    }
   } catch (error) {
     console.error('Failed to clear old cache:', error);
+    // Silently fail - don't break the app
   }
 }
 

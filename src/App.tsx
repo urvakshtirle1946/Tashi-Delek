@@ -22,6 +22,7 @@ import TravelPackagesPage from "./pages/Packages";
 import FoodPage from "./pages/Food";
 import GuidesPage from "./pages/Guides";
 import CommunityPage from "./pages/Community";
+import Archives from "./pages/Archives";
 import NotFound from "./pages/NotFound";
 import { GOOGLE_MAPS_API_KEY, GOOGLE_LIBRARIES } from "@/components/ui/google-map";
 
@@ -84,7 +85,7 @@ const App = () => {
               <Route path="/packages" element={<TravelPackagesPage />} />
               <Route path="/food" element={<FoodPage />} />
               <Route path="/guides" element={<GuidesPage />} />
-              <Route path="/archives" element={<CommunityPage />} />
+              <Route path="/archives" element={<Archives />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
