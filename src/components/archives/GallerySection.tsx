@@ -8,8 +8,8 @@ interface GalleryImage {
   image: string;
 }
 
-// Gallery data - Order matters for the column layout
-const galleryImages: GalleryImage[] = [
+// Default static images from public/gallery (these will always show)
+const DEFAULT_IMAGES: GalleryImage[] = [
   { id: 'g1', title: 'Summer in Sikkim', image: '/gallery/_Embrace summer in Sikkim with lush valleys and….jpg' },
   { id: 'g36', title: 'Somewhere in Sikkim', image: '/gallery/6th-image.jpg' },
   { id: 'g37', title: 'East Sikkim Tour', image: '/gallery/East Sikkim Tour Packages.jpg' },
@@ -50,6 +50,30 @@ const galleryImages: GalleryImage[] = [
 
 const GallerySection = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(DEFAULT_IMAGES);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const base = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        const res = await fetch(`${base}/gallery/public`);
+        const data = await res.json();
+        if (data?.success && Array.isArray(data.data?.photos)) {
+          const items: GalleryImage[] = data.data.photos.map((p: any) => ({
+            id: p.id,
+            title: p.title || 'Photo',
+            image: p.url,
+          }));
+          // Append dynamic items after defaults
+          setGalleryImages(prev => [...prev, ...items]);
+        }
+      } catch (e) {
+        // Keep defaults if fetch fails
+        console.error('Failed to load dynamic gallery, showing default images', e);
+      }
+    };
+    load();
+  }, []);
 
   const openLightbox = (index: number) => {
     setSelectedImageIndex(index);
@@ -75,15 +99,13 @@ const GallerySection = () => {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (selectedImageIndex === null) return;
-      
       if (e.key === 'ArrowRight') goToNext();
       else if (e.key === 'ArrowLeft') goToPrevious();
       else if (e.key === 'Escape') closeLightbox();
     };
-
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedImageIndex]);
+  }, [selectedImageIndex, galleryImages.length]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -97,16 +119,13 @@ const GallerySection = () => {
           <ImageIcon className="w-5 h-5 text-parchment-700" />
           <span className="text-sm font-medium text-parchment-800 uppercase tracking-wider">Photo Gallery</span>
         </div>
-        
-        <h2 className="text-4xl md:text-5xl font-serif font-bold text-ink-900 mb-4">
-          Visual Archives
-        </h2>
+        <h2 className="text-4xl md:text-5xl font-serif font-bold text-ink-900 mb-4">Visual Archives</h2>
         <p className="text-lg text-ink-600 max-w-2xl mx-auto font-light">
           Explore our curated collection of historical photographs and artifacts
         </p>
       </motion.div>
 
-      {/* Masonry Layout using CSS Columns - No gaps! */}
+      {/* Masonry Layout */}
       <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
         {galleryImages.map((image, index) => (
           <motion.div
@@ -118,7 +137,6 @@ const GallerySection = () => {
             className="break-inside-avoid mb-4 group cursor-pointer relative rounded-lg overflow-hidden bg-parchment-100 shadow-md hover:shadow-xl transition-all duration-300"
             onClick={() => openLightbox(index)}
           >
-            {/* Image Container - Natural Height */}
             <img
               src={image.image}
               alt={image.title}
@@ -129,13 +147,9 @@ const GallerySection = () => {
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
               }}
             />
-            
-            {/* Fallback Icon */}
             <div className="hidden w-full h-64 bg-gradient-to-br from-parchment-200 to-parchment-300 flex items-center justify-center">
               <ImageIcon className="w-12 h-12 text-parchment-400" />
             </div>
-
-            {/* Hover Overlay */}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
               <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl transform scale-90 group-hover:scale-100 transition-all duration-300">
                 <ZoomIn className="w-6 h-6 text-ink-900" />
@@ -143,69 +157,34 @@ const GallerySection = () => {
             </div>
           </motion.div>
         ))}
+        {galleryImages.length === 0 && (
+          <div className="text-center text-ink-600">No photos yet. Please check back later.</div>
+        )}
       </div>
 
       {/* Lightbox Modal */}
       <AnimatePresence>
         {selectedImageIndex !== null && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm"
-          >
-            {/* Close Button */}
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-            >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm">
+            <button onClick={closeLightbox} className="absolute top-4 right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
               <X className="w-6 h-6 text-white" />
             </button>
-
-            {/* Image Counter */}
             <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
-              <span className="text-white font-medium text-sm">
-                {selectedImageIndex + 1} / {galleryImages.length}
-              </span>
+              <span className="text-white font-medium text-sm">{selectedImageIndex + 1} / {galleryImages.length}</span>
             </div>
-
-            {/* Previous Button */}
-            <button
-              onClick={goToPrevious}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110"
-            >
+            <button onClick={goToPrevious} className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110">
               <ChevronLeft className="w-6 h-6 text-white" />
             </button>
-
-            {/* Next Button */}
-            <button
-              onClick={goToNext}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110"
-            >
+            <button onClick={goToNext} className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-4 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110">
               <ChevronRight className="w-6 h-6 text-white" />
             </button>
-
-            {/* Main Image Display */}
             <div className="h-full w-full flex items-center justify-center p-4">
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={selectedImageIndex}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                  className="relative w-full h-full flex items-center justify-center"
-                >
-                  <img
-                    src={galleryImages[selectedImageIndex].image}
-                    alt={galleryImages[selectedImageIndex].title}
-                    className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
-                  />
+                <motion.div key={selectedImageIndex} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} className="relative w-full h-full flex items-center justify-center">
+                  <img src={galleryImages[selectedImageIndex].image} alt={galleryImages[selectedImageIndex].title} className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl" />
                 </motion.div>
               </AnimatePresence>
             </div>
-
-            {/* Navigation Hint */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/50 text-sm">
               Use arrow keys ← → or click buttons to navigate
             </div>
@@ -213,7 +192,6 @@ const GallerySection = () => {
         )}
       </AnimatePresence>
 
-      {/* Decorative Elements */}
       <div className="mt-12 flex items-center justify-center gap-2 text-parchment-400">
         <div className="h-px w-12 bg-parchment-300"></div>
         <ImageIcon className="w-5 h-5" />
